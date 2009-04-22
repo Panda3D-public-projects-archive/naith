@@ -1,0 +1,29 @@
+<config>
+  <obj type="PhysicsObject" name="spam">
+    <isa source="level" name="Spam"/>
+    <mesh filename="spam/spam"/>
+    <physics type="box" surface="can_metal" mass="0.15" lx="0.09" ly="0.09" lz="0.12"/>
+    <damping linear="0.01" angular="0.005"/>
+  </obj>
+
+  <obj type="PhysicsObject" name="SimpleBox">
+    <isa source="level" name="SimpleBox"/>
+    <mesh filename="simplebox/simplebox"/>
+    <physics type="box" surface="sheet_metal" mass="48.0" lx="1.0" ly="1.0" lz="1.0"/>
+    <damping linear="0.01" angular="0.5"/>
+  </obj>
+
+  <obj type="PhysicsObject" name="Rock">
+    <isa source="level" name="Rock"/>
+    <mesh filename="rock/rock"/>
+    <physics type="mesh" surface="rock" mass="300.0" filename="rock/rock"/>
+    <damping linear="2000.0" angular="10.0"/>
+  </obj>
+
+  <obj type="PhysicsObject" name="VentGrill">
+    <isa source="level" name="Vent_Grill"/>
+    <mesh filename="vent_grill/vent_grill"/>
+    <physics type="box" surface="sheet_metal" mass="1.2" lx="0.9" ly="0.04" lz="0.9"/>
+    <damping linear="0.01" angular="0.5"/>
+  </obj>
+</config>
