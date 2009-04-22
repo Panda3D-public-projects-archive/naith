@@ -1,11 +1,13 @@
+= Simple Plugin System =
+
 A simple plugin system is being used - it exists primarily to allow for certain 'quick' customisations, and multiple applications from a single code base. It also handles loading screens.
 
 
 At any given point the game is a set of (usually) named instances of python classes - the config file lists these classes, each having its own block of xml:
 
-<obj type="..." name="..." ... > ... </obj>
+{{{<obj type="..." name="..." ... > ... </obj>}}}
 
-Type indicates which plugin to use, name the name used by other plugins to get this plugin instance. name can be omitted to make it not indexable (Such classes will never survive a transition however.)). A plugin consists of a directory with the plugin name in the plugin folder. It will contain a .py with the plugin name that contains a class with the plugin name - this will be instanced for each <obj> tag with the relevant type.
+Type indicates which plugin to use, name the name used by other plugins to get this plugin instance. name can be omitted to make it not indexable (Such classes will never survive a transition however.)). A plugin consists of a directory with the plugin name in the plugin folder. It will contain a .py with the plugin name that contains a class with the plugin name - this will be instanced for each obj tag with the relevant type.
 
 A plugin class has an __init__(self,manager,xml) constructor. The manager gives the plugin manager object, the xml gives the obj element that declares the instance, as a xml.etree Element from the python standard library.
 
