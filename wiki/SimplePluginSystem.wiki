@@ -1,0 +1,24 @@
+A simple plugin system is being used - it exists primarily to allow for certain 'quick' customisations, and multiple applications from a single code base. It also handles loading screens.
+
+
+At any given point the game is a set of (usually) named instances of python classes - the config file lists these classes, each having its own block of xml:
+
+<obj type="..." name="..." ... > ... </obj>
+
+Type indicates which plugin to use, name the name used by other plugins to get this plugin instance. name can be omitted to make it not indexable (Such classes will never survive a transition however.)). A plugin consists of a directory with the plugin name in the plugin folder. It will contain a .py with the plugin name that contains a class with the plugin name - this will be instanced for each <obj> tag with the relevant type.
+
+A plugin class has an __init__(self,manager,xml) constructor. The manager gives the plugin manager object, the xml gives the obj element that declares the instance, as a xml.etree Element from the python standard library.
+
+A plugin can optionally declare a reload(self,manager,xml) method - on transition from one config file to another if the new config file contains a variable with the same type that has this method it will be called instead of deleting the old one and replacing it.
+
+A plugin can optionally have a postInit generator and a postReload generator - in both cases called imediatly after the __init__ or Reload methods. These should be used if a lot of wor5k is happening to avoid blocking the framerate.
+
+
+A plugin can also have the start(self) method - this will be called in creation order on all plugins at the end of a transition.
+A plugin can also have the stop(self) method - this will be called in reverse creation order on all plugins at the start of a transition.
+
+Transitions are what make this system worthwhile - at any point you can transition to a new config file - so one config file could be the menu, then another for each level, etc. When transitioning a loading screen will automatically be displayed.
+
+Additionally, an 'Include' plugin will be provided, that allows one config file to include another, so shared stuff does not have to be repeated. For instance each level might include a key binding config, a player setup config and a gui config, for instance, and then contain stuff that is only specific to the level.
+
+File order is important for dependencies, as plugins are initialised in the order they are found in the xml file. (Including calls to the reload method on a transition.)
