@@ -39,20 +39,27 @@ class KeysFPS(DirectObject.DirectObject):
       self.slowSpeed = 2.5
 
     self.slow = False
+    self.crouched = False
 
-    # Get the jump function call...
+    # Get the jump, crouch and function call...
     jump = xml.find('jump')
     self.doJump = getattr(manager.get(jump.get('plugin')),jump.get('method'))
+
+    crouch = xml.find('crouch')
+    self.doCrouch = getattr(manager.get(crouch.get('plugin')),crouch.get('method'))
+
+    standup = xml.find('standup')
+    self.doStandUp = getattr(manager.get(standup.get('plugin')),standup.get('method'))
 
     # Get the weapon object to control...
     self.weapon = manager.get(xml.find('weapon').get('plugin'))
     
-    # Setup the task that updates feet to be relative to whatever in temrs of velocity...
+    # Setup the task that updates feet to be relative to whatever in terms of velocity...
     taskMgr.add(self.keysTask,'Keys',sort=-100)
 
 
   def keysTask(self,task):
-    if self.slow: speed = self.slowSpeed
+    if self.slow or self.crouched: speed = self.slowSpeed
     else: speed = self.speed
     
     walk = float(self.forward-self.backward) * speed
@@ -76,9 +83,8 @@ class KeysFPS(DirectObject.DirectObject):
     self.right = state
 
   def jump(self):
-    if not self.slow:
+    if (not self.slow) and (not self.crouched):
       self.doJump()
-
 
   def shoot(self):
     self.weapon.setFiring(True)
@@ -94,6 +100,14 @@ class KeysFPS(DirectObject.DirectObject):
     self.slow = False
     self.weapon.setAiming(False)
 
+  def crouch(self):
+    self.crouched = True
+    self.doCrouch()
+
+  def standup(self):
+    self.crouched = False
+    self.doStandUp()
+
 
   def start(self):
     self.accept('w',self.setForward,[1])
@@ -106,10 +120,28 @@ class KeysFPS(DirectObject.DirectObject):
     self.accept('d-up',self.setRight,[0])
     self.accept('space',self.jump)
 
+    self.accept('control-w',self.setForward,[1])
+    self.accept('control-w-up',self.setForward,[0])
+    self.accept('control-s',self.setBackward,[1])
+    self.accept('control-s-up',self.setBackward,[0])
+    self.accept('control-a',self.setLeft,[1])
+    self.accept('control-a-up',self.setLeft,[0])
+    self.accept('control-d',self.setRight,[1])
+    self.accept('control-d-up',self.setRight,[0])
+    self.accept('control-space',self.jump)
+
+    self.accept('lcontrol',self.crouch)
+    self.accept('lcontrol-up',self.standup)
+
     self.accept('mouse1',self.shoot)
     self.accept('mouse1-up',self.dontShoot)
     self.accept('mouse3',self.aim)
     self.accept('mouse3-up',self.relax)
+
+    self.accept('control-mouse1',self.shoot)
+    self.accept('control-mouse1-up',self.dontShoot)
+    self.accept('control-mouse3',self.aim)
+    self.accept('control-mouse3-up',self.relax)
 
   def stop(self):
     self.ignoreAll()

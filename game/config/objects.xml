@@ -3,7 +3,7 @@
     <isa source="level" name="Spam"/>
     <mesh filename="spam/spam"/>
     <physics type="box" surface="can_metal" mass="0.15" lx="0.09" ly="0.09" lz="0.12"/>
-    <damping linear="0.01" angular="0.005"/>
+    <damping linear="0.15" angular="0.001"/>
   </obj>
 
   <obj type="PhysicsObject" name="SimpleBox">
