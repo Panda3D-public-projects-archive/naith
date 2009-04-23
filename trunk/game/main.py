@@ -23,6 +23,8 @@ from bin.manager import *
 
 import sys
 
+#messenger.toggleVerbose()
+
 plugin = Manager()
 
 def firstLight(task):

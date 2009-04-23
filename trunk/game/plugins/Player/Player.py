@@ -30,11 +30,10 @@ class Player:
     self.radius = 0.3
     self.headHeight = 1.6
     self.crouchHeadHeight = 0.6
+    self.crouchSpeed = 4.0
     
     self.playerBaseImpulse = 15000.0 # Always avaliable - air control.
     self.playerImpulse = 75000.0 # Only when on ground
-    self.playerCrouchBaseImpulse = 7500.0
-    self.playerCrouchImpulse = 37500.0
     
     self.jumpForce = 16000.0
     self.jumpThreshold = 0.1 # How long ago the player must of touched the floor for them to be allowed to jump - gives them a bit of lee way.
@@ -65,19 +64,31 @@ class Player:
     self.body.setPosition(self.stomach.getPos(render))
     self.body.setAutoDisableFlag(False)
     
-    # Create a collision object - a capsule...
-    self.col = OdeCappedCylinderGeom(self.radius,self.height - self.radius*2.0)
-    self.col.setBody(self.body)
-    self.col.setCategoryBits(BitMask32(1))
-    self.col.setCollideBits(BitMask32(1))
-    ode.getSpace().add(self.col)
-    ode.getSpace().setSurfaceType(self.col,ode.getSurface('player'))
+    # Create a collision object - a capsule - we actually make two - one for standing, the other for crouching...
+    self.colStanding = OdeCappedCylinderGeom(self.radius,self.height - self.radius*2.0)
+    self.colStanding.setBody(self.body)
+    self.colStanding.setCategoryBits(BitMask32(1))
+    self.colStanding.setCollideBits(BitMask32(1))
+    ode.getSpace().add(self.colStanding)
+    ode.getSpace().setSurfaceType(self.colStanding,ode.getSurface('player'))
+
+    self.colCrouching = OdeCappedCylinderGeom(self.radius,self.crouchHeight - self.radius*2.0)
+    self.colCrouching.setBody(self.body)
+    self.colCrouching.setCategoryBits(BitMask32(0))
+    self.colCrouching.setCollideBits(BitMask32(0))
+    ode.getSpace().add(self.colCrouching)
+    ode.getSpace().setSurfaceType(self.colCrouching,ode.getSurface('player'))
 
     # We also need to store that a jump has been requested...
     self.doJump = False
     self.midJump = False
     self.lowVert = None # Lowest point of collision for the player each frame - to detect if they are on the floor or not
     self.lastOnFloor = 0.0 # How long ago since the player was on the floor - we give a threshold before we stop allowing jumping. Needed as ODE tends to make you alternate between touching/not touching.
+
+    # Need to know if we are crouching or not...
+    self.crouching = False
+    self.crouchingTarget = False
+    
 
     # Arrange for the players stomach to track the players feet. Well, manage most of the physics at any rate...
     def playerTask(task):
@@ -89,7 +100,10 @@ class Player:
       
       # Find out if the player is touching the floor or not - we check if the bottom hemisphere has touched anything - this uses the lowest collision point callback setup below...
       playerLoc = self.stomach.getPos(render)
-      playerKneeHeight = playerLoc[2] - self.height*0.5 + self.radius*0.75 # Reduce the radius to limit the steepness of ramps the player can climb/jump on.
+      if self.crouching: # radius is reduces below to prevent the player climbing really steep ramps.
+        playerKneeHeight = playerLoc[2] - self.crouchHeight*0.5 + self.radius*0.75
+      else:
+        playerKneeHeight = playerLoc[2] - self.height*0.5 + self.radius*0.75
       if (self.lowVert!=None) and (self.lowVert[2]<playerKneeHeight):
         self.lastOnFloor = 0.0
       else:
@@ -130,7 +144,43 @@ class Player:
       if (not onFloor) and (not self.midJump) and (vel[2]>0.0):
         vel[2] = 0.0
         self.body.setLinearVel(vel)
-      
+
+      # Crouching - this switches between the two cylinders immediatly on a mode change...
+      if self.crouching!=self.crouchingTarget:
+        self.crouching = self.crouchingTarget
+        if self.crouching:
+          # Going down...
+          self.colStanding.setCategoryBits(BitMask32(0))
+          self.colStanding.setCollideBits(BitMask32(0))
+          self.colCrouching.setCategoryBits(BitMask32(1))
+          self.colCrouching.setCollideBits(BitMask32(1))
+
+          offset = Vec3(0.0,0.0,0.5*(self.crouchHeight-self.height))
+          self.body.setPosition(self.body.getPosition() + offset)
+          self.stomach.setPos(self.stomach,offset)
+          self.view.setPos(self.view,-offset)
+        else:
+          # Going up...
+          self.colStanding.setCategoryBits(BitMask32(1))
+          self.colStanding.setCollideBits(BitMask32(1))
+          self.colCrouching.setCategoryBits(BitMask32(0))
+          self.colCrouching.setCollideBits(BitMask32(0))
+
+          offset = Vec3(0.0,0.0,0.5*(self.height-self.crouchHeight))
+          self.body.setPosition(self.body.getPosition() + offset)
+          self.stomach.setPos(self.stomach,offset)
+          self.view.setPos(self.view,-offset)
+
+      # Crouching - this makes the height height head towards the correct height, to give the perception that crouching takes time...
+      currentHeight = self.view.getZ() - self.neck.getZ()
+      if self.crouching:
+        targetHeight = self.crouchHeadHeight - 0.5*self.crouchHeight
+        newHeight = max(targetHeight,currentHeight - self.crouchSpeed * dt)
+      else:
+        targetHeight = self.headHeight - 0.5*self.height
+        newHeight = min(targetHeight,currentHeight + self.crouchSpeed * dt)
+      self.view.setZ(newHeight)
+
       return task.cont
 
     taskMgr.add(playerTask,'Player')
@@ -143,7 +193,7 @@ class Player:
     ode.regPreFunc('playerStandReset',playerStandReset)
 
 
-    # We also need the player to stand up - for stability this must be updated after every physics time step rather than every frame, we also take this opportunity to move the stomach to match the collision object...
+    # We also need the player to stay upright - for stability this must be updated after every physics time step rather than every frame, we also take this opportunity to move the stomach to match the collision object...
     def playerStandUp():
       self.body.setQuaternion(Quat())
       self.body.setTorque(0.0,0.0,0.0)
@@ -167,7 +217,8 @@ class Player:
           if self.lowVert==None or self.lowVert[2]>v[2]:
             self.lowVert = v
 
-    ode.regCollisionCB(self.col,onPlayerCollide)
+    ode.regCollisionCB(self.colStanding,onPlayerCollide)
+    ode.regCollisionCB(self.colCrouching,onPlayerCollide)
 
 
   def start(self):
@@ -180,6 +231,14 @@ class Player:
       self.stomach.setPos(self.stomach,0.0,0.0,0.5*self.height)
       self.body.setPosition(self.stomach.getPos(render))
 
+
+  def crouch(self):
+    """Makes the player crouch, unless they are already doing so."""
+    self.crouchingTarget = True
+
+  def standup(self):
+    """Makes the player stand up from crouching."""
+    self.crouchingTarget = False
 
   def jump(self):
     """Makes the player jump - only works when the player is touching the ground."""
