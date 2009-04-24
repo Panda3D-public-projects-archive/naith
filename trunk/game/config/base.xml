@@ -27,7 +27,7 @@
   <obj type="Player" name="player"/>
   
   <obj type="Camera" name="camera">
-    <fov deg="70" zoom="50" zoomTime="0.1" near="0.01" far="64.0"/>
+    <fov deg="70" zoom="50" zoomTime="0.1" near="0.05" far="64.0"/>
     <track plugin="player" node="view"/>
   </obj>
 
@@ -50,6 +50,7 @@
     <jump plugin="player" method="jump"/>
     <crouch plugin="player" method="crouch"/>
     <standup plugin="player" method="standup"/>
+    <crouching plugin="player" method="isCrouched"/>
     <weapon plugin="weapon"/>
   </obj>
 </config>

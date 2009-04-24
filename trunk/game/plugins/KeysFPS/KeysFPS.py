@@ -39,7 +39,6 @@ class KeysFPS(DirectObject.DirectObject):
       self.slowSpeed = 2.5
 
     self.slow = False
-    self.crouched = False
 
     # Get the jump, crouch and function call...
     jump = xml.find('jump')
@@ -51,6 +50,9 @@ class KeysFPS(DirectObject.DirectObject):
     standup = xml.find('standup')
     self.doStandUp = getattr(manager.get(standup.get('plugin')),standup.get('method'))
 
+    crouching = xml.find('crouching')
+    self.isCrouched = getattr(manager.get(crouching.get('plugin')),crouching.get('method'))
+
     # Get the weapon object to control...
     self.weapon = manager.get(xml.find('weapon').get('plugin'))
     
@@ -59,7 +61,7 @@ class KeysFPS(DirectObject.DirectObject):
 
 
   def keysTask(self,task):
-    if self.slow or self.crouched: speed = self.slowSpeed
+    if self.slow or self.isCrouched(): speed = self.slowSpeed
     else: speed = self.speed
     
     walk = float(self.forward-self.backward) * speed
@@ -83,7 +85,7 @@ class KeysFPS(DirectObject.DirectObject):
     self.right = state
 
   def jump(self):
-    if (not self.slow) and (not self.crouched):
+    if (not self.slow) and (not self.isCrouched()):
       self.doJump()
 
   def shoot(self):
@@ -101,11 +103,9 @@ class KeysFPS(DirectObject.DirectObject):
     self.weapon.setAiming(False)
 
   def crouch(self):
-    self.crouched = True
     self.doCrouch()
 
   def standup(self):
-    self.crouched = False
     self.doStandUp()
 
 
