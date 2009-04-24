@@ -50,3 +50,18 @@ def nearestHit(space,ray):
           bestMan = man
 
   return (bestGeom,bestPos)
+
+
+def collides(space,obj):
+  """Not really ray related, but similar to above. Tests if the given obj collides with anything in the given space - returns True if it does, False if it does not."""
+  for i in xrange(space.getNumGeoms()):
+    geom = space.getGeom(i)
+
+    testA = (geom.getCollideBits() & obj.getCollideBits()).isZero()
+    testB = (obj.getCollideBits() & geom.getCollideBits()).isZero()
+    if (not testA) or (not testB):
+      cc = OdeUtil.collide(obj,geom)
+      if cc.getNumContacts()!=0:
+        return True
+
+  return False

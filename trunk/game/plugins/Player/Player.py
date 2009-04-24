@@ -18,6 +18,8 @@ import math
 
 from pandac.PandaModules import *
 
+import ray_cast
+
 
 class Player:
   """A Player class - doesn't actually do that much, just arranges collision detection and provides a camera mount point, plus an interface for the controls to work with. All configured of course."""
@@ -78,6 +80,11 @@ class Player:
     self.colCrouching.setCollideBits(BitMask32(0))
     ode.getSpace().add(self.colCrouching)
     ode.getSpace().setSurfaceType(self.colCrouching,ode.getSurface('player'))
+
+    # Create a collision object ready for use when checking if the player can stand up or not - just a sphere with the relevant radius...
+    self.standCheck = OdeSphereGeom(self.radius)
+    self.standCheck.setCategoryBits(BitMask32(0xFFFFFFFE))
+    self.standCheck.setCollideBits(BitMask32(0xFFFFFFFE))
 
     # We also need to store that a jump has been requested...
     self.doJump = False
@@ -147,9 +154,10 @@ class Player:
 
       # Crouching - this switches between the two cylinders immediatly on a mode change...
       if self.crouching!=self.crouchingTarget:
-        self.crouching = self.crouchingTarget
-        if self.crouching:
-          # Going down...
+        if self.crouchingTarget:
+          # Going down - allways possible...
+          self.crouching = self.crouchingTarget
+          
           self.colStanding.setCategoryBits(BitMask32(0))
           self.colStanding.setCollideBits(BitMask32(0))
           self.colCrouching.setCategoryBits(BitMask32(1))
@@ -160,16 +168,24 @@ class Player:
           self.stomach.setPos(self.stomach,offset)
           self.view.setPos(self.view,-offset)
         else:
-          # Going up...
-          self.colStanding.setCategoryBits(BitMask32(1))
-          self.colStanding.setCollideBits(BitMask32(1))
-          self.colCrouching.setCategoryBits(BitMask32(0))
-          self.colCrouching.setCollideBits(BitMask32(0))
+          # Going up - need to check its safe to do so...
+          pos = self.body.getPosition()
+          pos[2] += 0.5*(self.height - self.crouchHeight) - self.radius
+          self.standCheck.setPosition(pos)
 
-          offset = Vec3(0.0,0.0,0.5*(self.height-self.crouchHeight))
-          self.body.setPosition(self.body.getPosition() + offset)
-          self.stomach.setPos(self.stomach,offset)
-          self.view.setPos(self.view,-offset)
+          space = self.manager.get('ode').getSpace()
+          if not ray_cast.collides(space,self.standCheck):
+            self.crouching = self.crouchingTarget
+          
+            self.colStanding.setCategoryBits(BitMask32(1))
+            self.colStanding.setCollideBits(BitMask32(1))
+            self.colCrouching.setCategoryBits(BitMask32(0))
+            self.colCrouching.setCollideBits(BitMask32(0))
+
+            offset = Vec3(0.0,0.0,0.5*(self.height-self.crouchHeight))
+            self.body.setPosition(self.body.getPosition() + offset)
+            self.stomach.setPos(self.stomach,offset)
+            self.view.setPos(self.view,-offset)
 
       # Crouching - this makes the height height head towards the correct height, to give the perception that crouching takes time...
       currentHeight = self.view.getZ() - self.neck.getZ()
