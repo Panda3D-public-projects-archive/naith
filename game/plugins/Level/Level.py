@@ -71,9 +71,11 @@ class Level:
     return self.things
 
   def getByIsA(self,name):
-    """Given a name this returns a list of all objects in the things structure that have the tag IsA with the given name as the data. Will return an empty list of none avaliable."""
+    """Given a name this returns a list of all objects in the things structure that have the tag IsA with the given name as the data. Will return an empty list if none available."""
+    if self.things == None: return []
     col = self.things.findAllMatches('**/=IsA='+name)
     ret = []
     for i in xrange(col.size()):
       ret.append(col[i])
     return ret
+
