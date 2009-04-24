@@ -13,10 +13,7 @@
 # limitations under the License.
 
 
-
 from pandac.PandaModules import *
-import direct.directbase.DirectStart
-
 
 class DirLight:
   """Creates a simple directional light"""
