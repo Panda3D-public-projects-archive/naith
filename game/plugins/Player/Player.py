@@ -256,6 +256,10 @@ class Player:
     """Makes the player stand up from crouching."""
     self.crouchingTarget = False
 
+  def isCrouched(self):
+    """Tells you if the player is crouching or not."""
+    return self.crouching
+
   def jump(self):
     """Makes the player jump - only works when the player is touching the ground."""
     self.doJump = True
