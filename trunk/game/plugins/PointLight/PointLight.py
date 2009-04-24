@@ -1,4 +1,4 @@
-# Copyright Tom SF hHaines
+# Copyright Reinier de Blois
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
 
 from pandac.PandaModules import VBase4
 from pandac.PandaModules import PointLight as PPointLight
-import direct.directbase.DirectStart
-
 
 class PointLight:
   """Creates a simple point light"""
