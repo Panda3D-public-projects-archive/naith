@@ -4,6 +4,7 @@
     <render filename="test/geometry"/>
     <collide filename="test/geometry"/> <!-- collision -->
     <things filename="test/things"/>
+    <ambient/>
   </obj>
   
   <obj type="DirLight" name="sun">

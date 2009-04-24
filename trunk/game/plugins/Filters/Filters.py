@@ -34,4 +34,4 @@ class Filters:
     bloom = xml.find('bloom')
     if bloom!=None:
       self.cf.setBloom(size=bloom.get('size', 'medium'))
-
+    base.bufferViewer.toggleEnable()

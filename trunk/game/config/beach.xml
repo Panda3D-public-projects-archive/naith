@@ -1,0 +1,19 @@
+<config>
+  <obj type="Include" config="base"/>
+  <obj type="Level" name="level">
+    <render filename="beach/beach"/>
+    <collide filename="beach/beach"/> <!-- collision -->
+    <!--<things filename="test/things"/>-->
+  </obj>
+  
+  <obj type="PointLight" name="sun">
+    <color r="5.0" g="4.0" b="1.25"/>
+    <pos x="-50000" y="200" z="50000"/>
+  </obj>
+
+  <obj type="Filters" config="filters">
+    <hdr type="1"/>
+    <perpixel/>
+    <bloom/>
+  </obj>
+</config>

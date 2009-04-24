@@ -29,6 +29,6 @@ class PointLight:
 
     pos = xml.find('pos')
     if pos!=None:
-      self.lightNode.setPos(float(pos.get('x')),float(pos.get('y')),float(pos.get('z')))
+      self.lightNode.setPos(render, float(pos.get('x')),float(pos.get('y')),float(pos.get('z')))
 
     render.setLight(self.lightNode)
