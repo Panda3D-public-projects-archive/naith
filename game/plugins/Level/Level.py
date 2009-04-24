@@ -30,11 +30,12 @@ class Level:
     if rendElem!=None:
       rendPath = os.path.join(basePath,rendElem.get('filename'))
       self.rend = loader.loadModel(rendPath)
-
-      self.ambLight = AmbientLight('Ambient Light')
-      self.ambLight.setColor(VBase4(1.0,1.0,1.0,1.0))
-      self.ambLightNode = self.rend.attachNewNode(self.ambLight)
-      self.rend.setLight(self.ambLightNode)
+      
+      if xml.find('ambient')!=None:
+        self.ambLight = AmbientLight('Ambient Light')
+        self.ambLight.setColor(VBase4(1.0,1.0,1.0,1.0))
+        self.ambLightNode = self.rend.attachNewNode(self.ambLight)
+        self.rend.setLight(self.ambLightNode)
     else:
       self.rend = None
 
