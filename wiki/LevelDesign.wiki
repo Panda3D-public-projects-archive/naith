@@ -1,0 +1,29 @@
+#labels Phase-Design
+#A page for discussion and ideas about level design
+= Introduction =
+
+Put ideas for level design here. As the project progresses, the ideas on this page should become more and more specific and approach agreed level layout.
+
+
+= Details =
+
+The level will be based on a tropical island of some description, primarily because it offers a large range of opportunities for special effects (sfx). At the moment the proposed level flow is something like this:
+
+Start point -> beach area -> jungle -> enemy base -> research labs -> cave system -> alien / advanced technology section (shiny stuff)
+
+Some basic sketches that I did when thinking about level layout, something for us to discuss anyway.
+
+http://aurilliance.p3dp.com/naith/island_ideas.jpg
+
+Ideas:
+  * Have the island on a volcano? This could offer several things:
+    * Somewhere for the cave system to lead rather than just underground
+    * An excuse for a massive explosion at the end of the game
+    * A large, defining body in the center of the island that is always visible (helps the player mentally place themselves on the island, rather than getting confused about where they are)
+    *Ssome nice sfx opportunities such as light coming through the mouth of the volcano at points while the player is underground (god rays, hdr, bloom, eye adaption fx) and some fire / magmar / lava effects towards the end of the game.
+  * The start point should be in an isolated position, to give the player a chance to familiarise with controls before encountering enemies. This could be on a raised bit of land / rocky plateau that is next to, and looks over the beach area
+  * The beach section could be along a curved bay, so the player can see their immediate goal in the distance. (Well, not really in the distance, but it gives them a sense of direction and purpose).
+  * Have a stream / river / waterfall at some point during the jungle region. This could narrow the play area for a nice firefight (the enemies holding one side of a bridge) and would also offer a chance for water sfx, a rainbow shader / effect etc.
+  * The enemy base might have a docks / be on the edge of the water. This could offer chance for a water based extraction (Submarine?) at the end of the game, or just another gameplay element
+  * If a volcano / large mountain is chosen for the island, the caves should burrow into the side of it, rather than going over the mouth of the volcano, this makes them look like they are going somewhere, and gives them a logical reason for existence (lava flows)\
+  * Add your idea here...
