@@ -20,10 +20,11 @@ from pandac.PandaModules import *
 
 
 def nearestHit(space,ray):
-  """Collides the given ray with the space provided by the ode module - returns (None,None) if it fails to hit anything or a tuple of (geom,position) of the closest point that it does hit."""
+  """Collides the given ray with the space provided by the ode module - returns (None,None,None) if it fails to hit anything or a tuple of (geom,position,normal) of the closest point that it does hit."""
   bestGeom = None
   bestPos = None
   bestMan = None
+  bestNorm = None
 
   rayPos = ray.getPosition()
 
@@ -39,17 +40,24 @@ def nearestHit(space,ray):
           # 1.6.0 code...
           contact = cc.getContact(j)
           pos = contact.getGeom().getPos()
+          norm = -ray.getDirection()
         except:
           # 1.6.1 code...
           pos = cc.getContactPoint(j)
+          norm = cc.getContactGeom(j).getNormal()
+          # Tempory code, needed until 1.6.2...
+          nl = norm.length()
+          if nl>1.5 or nl<0.5:
+            norm = -ray.getDirection()
 
         man = sum(map(lambda i: abs(pos[i]-rayPos[i]),xrange(3)))
         if (bestMan==None) or (man<bestMan):
           bestGeom = geom
           bestPos = pos
           bestMan = man
+          bestNorm = norm
 
-  return (bestGeom,bestPos)
+  return (bestGeom,bestPos,bestNorm)
 
 
 def collides(space,obj):
