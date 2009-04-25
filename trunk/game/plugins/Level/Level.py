@@ -66,7 +66,7 @@ class Level:
     if self.rend: self.rend.reparentTo(render)
 
   def stop(self):
-    if self.rend: self.rend.clearParent()
+    if self.rend: self.rend.detachNode()
 
   def getThings(self):
     return self.things

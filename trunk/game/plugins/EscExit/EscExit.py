@@ -14,17 +14,16 @@
 
 
 
-import sys
 from direct.showbase import DirectObject
 
 
 class EscExit(DirectObject.DirectObject):
   """This arranges it so that the escape key causes the program to instantly exit. Note that it disables this feature during a transition - this is required otherwise this object could never be deleted."""
   def __init__(self,manager,xml):
-    pass
+    self.end = manager.end;
 
   def start(self):
-    self.accept('escape',sys.exit)
+    self.accept('escape',self.end)
 
   def stop(self):
     self.ignore('escape')

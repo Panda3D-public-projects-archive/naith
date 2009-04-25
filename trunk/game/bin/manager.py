@@ -80,7 +80,7 @@ class Manager:
         name = obj[1]
         if (not self.oldNamed.has_key(name)) or self.oldNamed[name]!=True:
           # It needs to die - we let the reference count being zeroed do the actual deletion but it might have a slow death, so we use the destroy method/generator to make it happen during the progress bar ratehr than blocking the gc at some random point...
-          destroy = getattr(inst,'stop',None)
+          destroy = getattr(inst,'destroy',None)
           if isinstance(destroy,types.MethodType):
             ret = destroy()
             yield task.cont
@@ -100,6 +100,30 @@ class Manager:
 
     # Create a task to do the dirty work...
     taskMgr.add(transTask,'Transition')
+
+
+  def end(self):
+    """Ends the program neatly - closes down all the plugins before calling sys.exit(). Effectivly a partial transition, though without the framerate maintenance."""
+
+    # Stop all the plugins...
+    for obj in self.objList:
+      stop = getattr(obj[0],'stop',None)
+      if isinstance(stop,types.MethodType):
+        stop()
+
+    # Destroy the database...
+    for obj in self.objList:
+      inst = obj[0]
+      name = obj[1]
+      destroy = getattr(inst,'destroy',None)
+      if isinstance(destroy,types.MethodType):
+        ret = destroy()
+        if isinstance(ret,types.GeneratorType):
+          for blah in ret:
+            pass
+
+    # Die...
+    sys.exit()
 
 
   def addObj(self,element):
