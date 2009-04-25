@@ -53,4 +53,8 @@
     <crouching plugin="player" method="isCrouched"/>
     <weapon plugin="weapon"/>
   </obj>
+
+  <obj type="MethodOnKey" name="playerReset">
+    <action key="f9" plugin="player" method="reset"/>
+  </obj>
 </config>

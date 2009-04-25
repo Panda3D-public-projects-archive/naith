@@ -15,6 +15,7 @@
 
 
 import math
+import random
 
 from pandac.PandaModules import *
 
@@ -238,14 +239,7 @@ class Player:
 
 
   def start(self):
-    # Get the players starting position and rotation...
-    start = self.manager.get('level').getByIsA('PlayerStart')
-    if len(start)>0:
-      start = start[0]
-      self.neck.setH(start.getH(render))
-      self.stomach.setPos(start.getPos(render))
-      self.stomach.setPos(self.stomach,0.0,0.0,0.5*self.height)
-      self.body.setPosition(self.stomach.getPos(render))
+    self.reset()
 
 
   def crouch(self):
@@ -263,6 +257,21 @@ class Player:
   def jump(self):
     """Makes the player jump - only works when the player is touching the ground."""
     self.doJump = True
+
+  def reset(self):
+    """Resets the player back to their starting position. (Leaves rotation alone - this is for debuging falling out the level kinda stuff.)"""
+    start = self.manager.get('level').getByIsA('PlayerStart')
+    if len(start)>0:
+      start = random.choice(start) # If there are multiple player starts choose one at random!
+      self.neck.setH(start.getH(render))
+      self.stomach.setPos(start.getPos(render))
+    else:
+      self.neck.setH(0.0)
+      self.stomach.setPos(Vec3(0.0,0.0,0.0))
+    
+    self.stomach.setPos(self.stomach,0.0,0.0,0.5*self.height)
+    self.body.setPosition(self.stomach.getPos(render))
+    self.body.setLinearVel(Vec3(0.0,0.0,0.0))
 
 
   def getNode(self,name):
