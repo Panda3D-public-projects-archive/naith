@@ -16,7 +16,7 @@ Ideas:
     * Somewhere for the cave system to lead rather than just underground
     * An excuse for a massive explosion at the end of the game
     * A large, defining body in the center of the island that is always visible (helps the player mentally place themselves on the island, rather than getting confused about where they are)
-    *Some nice sfx opportunities such as light coming through the mouth of the volcano at points while the player is underground (god rays, hdr, bloom, eye adaption fx) and some fire / magmar / lava effects towards the end of the game.
+    *Some nice sfx opportunities such as fire / magmar / lava effects towards the end of the game and light coming through the mouth of the volcano at points while the player is underground (god rays, hdr, bloom, eye adaption fx). See the below picture. <br/><img src=http://aurilliance.p3dp.com/naith/crysis_light_caves.jpg width=400 height=300>
   * The start point should be in an isolated position, to give the player a chance to familiarise with controls before encountering enemies. This could be on a raised bit of land / rocky plateau that is next to, and looks over the beach area
   * The beach section could be along a curved bay, so the player can see their immediate goal in the distance. (Well, not really in the distance, but it gives them a sense of direction and purpose).
   * Have a stream / river / waterfall at some point during the jungle region. This could narrow the play area for a nice firefight (the enemies holding one side of a bridge) and would also offer a chance for water sfx, a rainbow shader / effect etc.
