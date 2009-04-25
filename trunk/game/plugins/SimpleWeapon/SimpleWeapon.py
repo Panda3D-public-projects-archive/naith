@@ -96,14 +96,26 @@ class SimpleWeapon:
         self.triggerTime += dt
         while self.triggerTime>self.bulletRate:
           self.triggerTime -= self.bulletRate
-          hit,pos = ray_cast.nearestHit(self.space,self.ray)
+          hit,pos,norm = ray_cast.nearestHit(self.space,self.ray)
 
           # Create a muzzle flash effect...
           self.flashManager.doEffect(self.flashEffect, self.flashBone, True, self.flashPos)
 
           # Create an impact sparks effect...
-          # Need to do rotation and make effect visible ############################################
-          self.sparksManager.doEffect(self.sparksEffect, render, False, pos)
+          if hit!=None:
+            # Calculate the reflection direction...
+            rd = self.ray.getDirection()
+            sparkDir = (norm * (2.0*norm.dot(rd))) - rd
+            
+            # Convert the reflection direction into a quaternion that will rotate +ve z to the required direction...
+            ang = -math.acos(Vec3(0.0,0.0,1.0).dot(sparkDir))
+            axis = Vec3(0.0,0.0,1.0).cross(sparkDir)
+            axis.normalize()
+            sparkQuat = Quat()
+            sparkQuat.setFromAxisAngleRad(ang,axis)
+            
+            # Set it going...
+            self.sparksManager.doEffect(self.sparksEffect, render, False, pos, sparkQuat)
           
           # Impart some energy on the object...
           if hit!=None and hit.hasBody():
