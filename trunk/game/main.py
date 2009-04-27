@@ -16,6 +16,9 @@
 
 # Entry point - sets up the plugin system by giving it the config file to load and then releases panda to do its thing...
 
+# Important: this must be first
+from pandac.PandaModules import loadPrcFile
+loadPrcFile("config/settings.prc")
 import direct.directbase.DirectStart
 from direct.task import Task
 
