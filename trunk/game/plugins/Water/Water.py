@@ -73,6 +73,8 @@ class Water:
     self.sky.setTwoSided(True)
     self.sky.setSz(self.sky, -1)
     self.sky.setClipPlaneOff(1)
+    self.sky.show(BitMask32.bit(1))
+    self.sky.hide(BitMask32.bit(0))
     self.wcamera.reparentTo(render)
     self.wcamera.node().setLens(base.camLens)
     self.wcamera.node().setCameraMask(BitMask32.bit(1))

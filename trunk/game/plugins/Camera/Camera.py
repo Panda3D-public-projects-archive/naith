@@ -21,9 +21,9 @@ from pandac.PandaModules import *
 class Camera:
   """Does camera set up - will probably end up with lots of options."""
   def __init__(self,manager,xml):
+    base.camNode.setCameraMask(BitMask32.bit(0))
     base.disableMouse()
     self.reload(manager,xml)
-
 
   def reload(self,manager,xml):
     # Set the cameras initial position from the configuration file - only matters if the camera isn't about to be made a child of node to be controlled elsewhere...
@@ -76,7 +76,7 @@ class Camera:
     # Remove the camera zooming task...
     taskMgr.remove(self.zoomTask)
     self.zoomTask = None
-    
+
 
   def setZoomed(self,s):
     self.zoomed = s
