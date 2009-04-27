@@ -5,17 +5,22 @@
     <collide filename="beach/beach"/> <!-- collision -->
     <!--<things filename="test/things"/>-->
   </obj>
-  
-  
+
+  <obj type="Sky" name="sky">
+    <skydome filename="early.png"/>
+    <sunmask filename="early_mask.png"/>
+    <sunorigin x="-0.647" y="-0.740" z="0.181"/>
+    <godrays r="1.0" g="0.8" b="0.25"/>
+  </obj>
+
   <obj type="PointLight" name="sun">
     <color r="5.0" g="4.0" b="1.25"/>
     <pos x="-50000" y="200" z="50000"/>
   </obj>
-  
-  
+
   <obj type="Filters" config="filters">
     <hdr type="1"/>
     <perpixel/>
-    <bloom/>
+    <bloom size="medium"/>
   </obj>
 </config>

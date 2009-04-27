@@ -3,14 +3,16 @@
   <obj type="FrameRate" name="frame_rate"/>
   <obj type="Screenshot" name="screenshot"/>
   <obj type="Profile" name="profile"/>
-  
+
   <obj type="Global" name="paths">
     <levels path="data/levels"/>
     <weapons path="data/weapons"/>
     <objects path="data/objects"/>
     <particles path="data/particles"/>
+    <shaders path="data/shaders"/>
+    <skies path="data/skies"/>
   </obj>
-  
+
   <obj type="InitODE" name="ode">
     <surface name="default" mu="0.5" bounce="0.7" absorb="1.0"/>
     <surface name="player" mu="0.0" bounce="0.0" absorb="100.0"/>
@@ -25,7 +27,7 @@
   </obj>
 
   <obj type="Player" name="player"/>
-  
+
   <obj type="Camera" name="camera">
     <fov deg="70" zoom="50" zoomTime="0.1" near="0.05" far="64.0"/>
     <track plugin="player" node="view"/>
@@ -44,7 +46,7 @@
     <x-rot plugin="player" node="neck"/>
     <y-rot plugin="player" node="view" min="-80" max="80"/>
   </obj>
-  
+
   <obj type="KeysFPS" name="keys">
     <offset plugin="player" node="feet" speed="6.0" slowSpeed="2.0"/>
     <jump plugin="player" method="jump"/>
