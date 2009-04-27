@@ -1,4 +1,4 @@
-# Copyright Tom SF Haines, Aaron Snoswell
+# Copyright Tom SF Haines, Reinier de Blois, Aaron Snoswell
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,25 +14,30 @@
 
 
 from pandac.PandaModules import VBase4
-from pandac.PandaModules import DirectionalLight as PDirectionalLight
+from pandac.PandaModules import Spotlight as PSpotLight
+from pandac.PandaModules import PerspectiveLens
 
-class DirLight:
-  """Creates a simple directional light"""
+# XXX Name should be Spotlight (see panda manual) but for consistency, I'll leave it as is
+class SpotLight:
+  """Creates a simple spot light"""
   def __init__(self,manager,xml):
-    self.light = PDirectionalLight('dlight')
+    self.light = PSpotLight('slight')
 
     color = xml.find('color')
     if color!=None:
       self.light.setColor(VBase4(float(color.get('r')),float(color.get('g')),float(color.get('b')),1.0))
-
+    
+    lens = PerspectiveLens()
+    self.light.setLens(lens)
+    
     self.lightNode = render.attachNewNode(self.light)
-
+    
     pos = xml.find('pos')
     if pos!=None:
-      self.lightNode.setPos(float(pos.get('x')),float(pos.get('y')),float(pos.get('z')))
-
-    lookAt = xml.find('lookAt')
-    if lookAt!=None:
-      self.lightNode.lookAt(float(lookAt.get('x')),float(lookAt.get('y')),float(lookAt.get('z')))
-
+      self.lightNode.setPos(render, float(pos.get('x')),float(pos.get('y')),float(pos.get('z')))
+    
+    lookatpos = xml.find('lookatpos')
+    if lookatpos!=None:
+      self.lightNode.lookAt(render, float(lookatpos.get('x')),float(lookatpos.get('y')),float(lookatpos.get('z')))
+    
     render.setLight(self.lightNode)
