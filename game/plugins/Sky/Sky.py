@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import os
-from pandac.PandaModules import Point2, Vec3, Vec4, NodePath, CardMaker, Shader, ColorBlendAttrib
+from pandac.PandaModules import Point2, Vec3, Vec4, NodePath, CardMaker, Shader, ColorBlendAttrib, Texture
 
 class Sky:
   """This loads a skydome/box/whatever the user specified."""
@@ -71,13 +71,15 @@ class Sky:
         cam.node().setTagStateKey('sun')
         cam.node().setTagState('True', tagstatenode.getState())
         self.vltexture = self.vlbuffer.getTexture()
+        self.vltexture.setWrapU(Texture.WMClamp)
+        self.vltexture.setWrapV(Texture.WMClamp)
         card = CardMaker('VolumetricLightingCard')
         card.setFrameFullscreenQuad()
         self.finalQuad = render2d.attachNewNode(card.generate())
         self.finalQuad.setAttrib(ColorBlendAttrib.make(ColorBlendAttrib.MAdd))
         self.finalQuad.setShader(Shader.load(os.path.join(manager.get('paths').getConfig().find('shaders').get('path'), 'filter-vlight.cg')))
         self.finalQuad.setShaderInput('src', self.vltexture)
-        self.finalQuad.setShaderInput('vlparams', 64, 1.0 / 64, 1.0, 0.03)
+        self.finalQuad.setShaderInput('vlparams', 32, 1.0/32.0, 1.0, 0.03)
         self.finalQuad.setShaderInput('casterpos', 0.5, 0.5, 0, 0)
         vlcolor = Vec4(float(godrays.get('r', '1')), float(godrays.get('g', '1')), float(godrays.get('b', '1')), 1)
         self.finalQuad.setShaderInput('vlcolor', vlcolor)
