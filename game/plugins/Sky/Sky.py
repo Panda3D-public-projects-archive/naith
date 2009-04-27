@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import os
-from pandac.PandaModules import Point2, Vec3, Vec4, NodePath, CardMaker, Shader, ColorBlendAttrib, Texture
+from pandac.PandaModules import Point2, Vec3, Vec4, NodePath, CardMaker, Shader, ColorBlendAttrib, Texture, BitMask32
 
 class Sky:
   """This loads a skydome/box/whatever the user specified."""
@@ -56,6 +56,8 @@ class Sky:
       self.model.setTexture(loader.loadTexture(os.path.join(basePath, skydome.get('filename'))))
       self.model.setTag('sun', 'True')
       self.model.reparentTo(base.cam)
+      # Hide from the reflection camera
+      self.model.hide(BitMask32.bit(1))
 
       godrays = xml.find('godrays')
       sunmask = xml.find('sunmask')
