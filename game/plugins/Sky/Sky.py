@@ -18,6 +18,11 @@ from pandac.PandaModules import Point2, Vec3, Vec4, NodePath, CardMaker, Shader,
 class Sky:
   """This loads a skydome/box/whatever the user specified."""
   def __init__(self,manager,xml):
+    # Set the background color first
+    background = xml.find("background")
+    if background != None:
+      base.setBackgroundColor(Vec4(float(background.get('r')), float(background.get('g')), float(background.get('b')), 1))
+
     # Get the path to load skies from...
     basePath = manager.get('paths').getConfig().find('skies').get('path')
 

@@ -1,0 +1,129 @@
+//Cg
+
+struct Wave {
+  float freq;  // 2*PI / wavelength
+  float amp;   // amplitude
+  float phase; // speed * 2*PI / wavelength
+  float2 dir;
+};
+
+
+void vshader(in float4 vtx_position : POSITION,
+             in uniform float4 k_time,
+             in uniform float4x4 mat_modelproj,
+             in uniform float4 k_waveInfo,
+             in uniform float4 k_param2,
+             in uniform float4 k_param3,
+             in uniform float4 k_speed,
+             in uniform float4 mspos_camera,
+             out float4 l_texcoord0 : TEXCOORD0,
+             out float4 l_eyeVector: TEXCOORD1,
+             out float3 l_rotmatrix1: TEXCOORD2,
+             out float3 l_rotmatrix2: TEXCOORD3,
+             out float3 l_rotmatrix3: TEXCOORD4,
+             out float4 l_bumpCoord01: TEXCOORD5,
+             out float4 l_bumpCoord23: TEXCOORD6,
+             out float4 l_position : POSITION)
+{
+  float ddx = 0.0, ddy = 0.0;
+  float deriv;
+  float angle;
+
+  float4 position = vtx_position;
+
+  Wave wave[2] = {
+    { 1.0, 1.0, 0.5, float2(-2, 0) },
+    { 2.0, 0.5, 1.7, float2(-0.7, 0.7) }
+  };
+    wave[0].freq = k_waveInfo.x; //waveFreq;
+    wave[0].amp = k_waveInfo.y; //waveAmp;
+  wave[0].dir = k_speed.xy;
+
+    wave[1].freq = k_waveInfo.x * 3.0; // waveFreq * 3.0;
+    wave[1].amp = k_waveInfo.y * 0.33; //waveAmp * 0.33;
+  wave[1].dir = k_speed.zw;
+
+  for(int i = 0; i<2; ++i)
+  {
+    angle = dot(wave[i].dir, position.xy) * wave[i].freq + k_time.x * wave[i].phase;
+    position.z += wave[i].amp * sin( angle );
+    // calculate derivate of wave function
+    deriv = wave[i].freq * wave[i].amp * cos(angle);
+    ddx -= deriv * wave[i].dir.x;
+    ddy -= deriv * wave[i].dir.y;
+  }
+  float BumpScale = k_waveInfo.z;
+  l_rotmatrix1.xyz = BumpScale * normalize(float3(1, 0, ddy)); // Binormal
+  l_rotmatrix2.xyz = BumpScale * normalize(float3(0, 1, ddx)); // Tangent
+  l_rotmatrix3.xyz = normalize(float3(ddx, ddy, 1)); // Normal
+
+  float2 bumpSpeed = k_param2.xy;
+  float2 textureScale = k_param2.zw;
+  // calculate texture coordinates for normal map lookup
+  l_bumpCoord01.xy = vtx_position.xy*textureScale + k_time.x * bumpSpeed;
+  l_bumpCoord01.zw = vtx_position.xy*textureScale * 2.0 + k_time.x * bumpSpeed * 4.0;
+  l_bumpCoord23.xy = vtx_position.xy*textureScale * 4.0 + k_time.x * bumpSpeed * 8.0;
+  l_bumpCoord23.zw = vtx_position.xy;
+
+  // transform vertex position by combined view projection matrix
+    l_position = mul(mat_modelproj, position);
+  l_eyeVector = position - mspos_camera;
+
+
+    float4x4 scaleMatrix = { 0.5f, 0.0f, 0.0f, 0.5f,
+                           0.0f, 0.5f, 0.0f, 0.5f,
+                                 0.0f, 0.0f, 0.5f, 0.5f,
+                                 0.0f, 0.0f, 0.0f, 1.0f };
+  l_texcoord0 = mul(mul(scaleMatrix, mat_modelproj), position);
+}
+
+void fshader(
+    in float4 l_texcoord0 : TEXCOORD0,
+        in uniform sampler2D k_reflection : TEXUNIT0,
+    in uniform sampler2D k_normal : TEXUNIT1,
+    in float4 l_eyeVector: TEXCOORD1,
+    in float3 l_rotmatrix1: TEXCOORD2,
+    in float3 l_rotmatrix2: TEXCOORD3,
+    in float3 l_rotmatrix3: TEXCOORD4,
+    in float4 l_bumpCoord01: TEXCOORD5,
+    in float4 l_bumpCoord23: TEXCOORD6,
+    in uniform float4 k_param3,
+    in uniform float4 k_param4,
+    in uniform float4 k_deepcolor,
+    in uniform float4 k_shallowcolor,
+    in uniform float4 k_reflectioncolor,
+    out float4 o_color : COLOR)
+{
+  float4 t0 = tex2D(k_normal, l_bumpCoord01.xy) * 2.0 - 1.0;
+  float4 t1 = tex2D(k_normal, l_bumpCoord01.zw) * 2.0 - 1.0;
+  float4 t2 = tex2D(k_normal, l_bumpCoord23.xy) * 2.0 - 1.0;
+  float3 N = t0.xyz + t1.xyz + t2.xyz;
+
+  float3x3 m; // tangent to world matrix
+  m[0] = l_rotmatrix1;
+  m[1] = l_rotmatrix2;
+  m[2] = l_rotmatrix3;
+  N = normalize( mul( N, m ) );
+  float3 E = normalize(l_eyeVector.xyz);
+  float4 reflectionAmount = k_param3.x;
+  float4 waterAmount = k_param3.y;
+  float4 fresnelPower = k_param4.x; //5.0;
+  float4 fresnelBias = k_param4.y; //0.328;
+  float4 hdrMultiplier = k_param4.z; //0.471;
+  float reflectionBlur = k_param4.w; //0.0;
+  float facing = 1.0 - max(dot(-E, N), 0);
+
+  // Reflection
+  float4 reflection;
+  //reflection.rgb = tex2Dproj(k_reflection, l_texcoord0).rgb;
+  float4 distortion = normalize( tex2D( k_normal, N.xy ) - 0.5f ) * 0.1;
+  reflection = tex2Dproj( k_reflection, l_texcoord0 + distortion);
+
+  // Cheap HDR effect
+  reflection.rgb *= (reflection.r + reflection.g + reflection.b) * hdrMultiplier;
+  reflection.rgb *= facing;
+  float fresnel = saturate(fresnelBias + pow(facing, fresnelPower));
+  o_color = lerp(k_shallowcolor, k_deepcolor, facing) * waterAmount;
+  o_color += lerp(o_color,  reflection * k_reflectioncolor, fresnel) * reflectionAmount;
+  o_color.a = 1.0;
+}
