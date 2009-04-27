@@ -19,7 +19,7 @@ from pandac.PandaModules import PointLight as PPointLight
 class PointLight:
   """Creates a simple point light"""
   def __init__(self,manager,xml):
-    self.light = PPointLight('light')
+    self.light = PPointLight('plight')
 
     color = xml.find('color')
     if color!=None:
