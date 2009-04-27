@@ -20,18 +20,19 @@ class Filters:
   """Class handles postprocessing filters and effects"""
   def __init__(self,manager,xml):
     self.cf = CommonFilters(base.win, base.cam)
-    
+
     hdr = xml.find('hdr')
     if hdr!=None:
       hdrtype = hdr.get('type')
       assert hdrtype in ['0', '1', '2']
       render.setAttrib(getattr(LightRampAttrib, "makeHdr" + hdrtype)())
-    
+
     perpixel = xml.find('perpixel')
     if perpixel!=None:
       render.setShaderAuto()
-    
+
     bloom = xml.find('bloom')
     if bloom!=None:
       self.cf.setBloom(size=bloom.get('size', 'medium'))
+
     base.bufferViewer.toggleEnable()
