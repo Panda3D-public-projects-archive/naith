@@ -7,10 +7,14 @@
   </obj>
 
   <obj type="Sky" name="sky">
+    <background r="0.83" g="0.95" b="0.95"/>
     <skydome filename="early.png"/>
     <sunmask filename="early_mask.png"/>
     <sunorigin x="-0.647" y="-0.740" z="0.181"/>
     <godrays r="1.0" g="0.8" b="0.25"/>
+  </obj>
+
+  <obj type="Water" name="water">
   </obj>
 
   <obj type="PointLight" name="sun">
@@ -20,7 +24,7 @@
 
   <obj type="Filters" config="filters">
     <hdr type="1"/>
-    <perpixel/>
+    <perpixele/>
     <bloom size="medium"/>
   </obj>
 </config>
