@@ -58,7 +58,7 @@ class Water:
 
     self.surface.setShaderInput('waveInfo', Vec4(0.2, 0.5, 0.5,0.1))
     self.surface.setShaderInput('param2', Vec4(-0.015,0.005, 0.05, 0.05))
-    self.surface.setShaderInput('param3', Vec4(1.0, 0.3, 0, 0))
+    self.surface.setShaderInput('param3', Vec4(0.7, 0.3, 0, 0))
     self.surface.setShaderInput('param4', Vec4(5.0, 0.328, 0.471, 0.0))
     self.surface.setShaderInput('speed', Vec4(-0.5, 0.2, -0.7, -0.15))
     self.surface.setShaderInput('deepcolor', Vec4(0.0,0.3,0.5,1.0))
