@@ -20,8 +20,12 @@
 
   <obj type="Clouds" name="clouds">
     <splat fname="cloud_splat.png"/>
-    <!--<range x1="-100" y1="-100" z1="100" x2="100" y2="100" z2="100"/>-->
-    <cloud filename="cloud2.egg" softness="0.5"/>
+    <range x1="-200" y1="-30" z1="30" x2="200" y2="200" z2="30"/>
+    <cloud filename="clouds.egg" softness="1"/>
+    <cloud filename="clouds.egg" softness="0.75"/>
+    <cloud filename="clouds.egg" softness="0.5"/>
+    <cloud filename="clouds.egg" softness="0.25"/>
+    <cloud filename="clouds.egg" softness="0"/>
     <!--<cloud filename="test2.egg" pstratus="0.58"/>-->
   </obj>
 
