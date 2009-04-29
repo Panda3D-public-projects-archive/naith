@@ -74,6 +74,7 @@ class Sky:
         tagstatenode = NodePath('SunOverrideState')
         tagstatenode.setColorScale(1, 1, 1, 1, 10001)
         tagstatenode.setTexture(loader.loadTexture(os.path.join(basePath, sunmask.get('filename'))))
+        cam.node().setCameraMask(BitMask32.bit(2))
         cam.node().setInitialState(initstatenode.getState())
         cam.node().setTagStateKey('sun')
         cam.node().setTagState('True', tagstatenode.getState())
@@ -86,9 +87,10 @@ class Sky:
         self.finalQuad.setAttrib(ColorBlendAttrib.make(ColorBlendAttrib.MAdd))
         self.finalQuad.setShader(Shader.load(os.path.join(manager.get('paths').getConfig().find('shaders').get('path'), 'filter-vlight.cg')))
         self.finalQuad.setShaderInput('src', self.vltexture)
-        self.finalQuad.setShaderInput('vlparams', 32, 1.0/32.0, 1.0, 0.03)
+        self.finalQuad.setShaderInput('vlparams', 32, 0.9/32.0, 0.97, 0.5)
         self.finalQuad.setShaderInput('casterpos', 0.5, 0.5, 0, 0)
-        vlcolor = Vec4(float(godrays.get('r', '1')), float(godrays.get('g', '1')), float(godrays.get('b', '1')), 1)
+        # Last parameter to vlcolor is the exposure
+        vlcolor = Vec4(float(godrays.get('r', '1')), float(godrays.get('g', '1')), float(godrays.get('b', '1')), 0.05)
         self.finalQuad.setShaderInput('vlcolor', vlcolor)
         self.updateTask = taskMgr.add(self.update, 'sky-update')
 

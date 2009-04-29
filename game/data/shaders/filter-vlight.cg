@@ -33,6 +33,7 @@ void fshader(float2 l_texcoord0 : TEXCOORD0,
     vlcolor += sample.rgb;
     decay *= k_vlparams.z;
   }
-  o_color = float4(vlcolor * k_vlparams.w, 1) * k_vlcolor;
+  o_color.rgb = min(vlcolor.rgb * k_vlcolor.www * k_vlcolor.rgb, k_vlparams.www);
+  o_color.a = 0;
 }
 
