@@ -6,6 +6,11 @@
     <!--<things filename="test/things"/>-->
   </obj>
 
+  <obj type="PhysicsObject" name="floor">
+    <physics type="plane" surface="default" a="0" b="0" c="1" d="0"/>
+    <instance z="-1"/>
+  </obj>
+
   <obj type="Sky" name="sky">
     <background r="0.83" g="0.95" b="0.95"/>
     <skydome filename="early.png"/>
