@@ -11,6 +11,7 @@ struct Wave {
 void vshader(in float4 vtx_position : POSITION,
              in uniform float4 k_time,
              in uniform float4x4 mat_modelproj,
+             in uniform float4x4 trans_model_to_world,
              in uniform float4 k_waveInfo,
              in uniform float4 k_param2,
              in uniform float4 k_param3,
@@ -29,7 +30,7 @@ void vshader(in float4 vtx_position : POSITION,
   float deriv;
   float angle;
 
-  float4 position = vtx_position;
+  float2 position = mul(trans_model_to_world, vtx_position).xy;
 
   Wave wave[2] = {
     { 1.0, 1.0, 0.5, float2(-2, 0) },
@@ -45,8 +46,8 @@ void vshader(in float4 vtx_position : POSITION,
 
   for(int i = 0; i<2; ++i)
   {
-    angle = dot(wave[i].dir, position.xy) * wave[i].freq + k_time.x * wave[i].phase;
-    position.z += wave[i].amp * sin( angle );
+    angle = dot(wave[i].dir, position) * wave[i].freq + k_time.x * wave[i].phase;
+    vtx_position.z = wave[i].amp * sin( angle );
     // calculate derivate of wave function
     deriv = wave[i].freq * wave[i].amp * cos(angle);
     ddx -= deriv * wave[i].dir.x;
@@ -60,21 +61,21 @@ void vshader(in float4 vtx_position : POSITION,
   float2 bumpSpeed = k_param2.xy;
   float2 textureScale = k_param2.zw;
   // calculate texture coordinates for normal map lookup
-  l_bumpCoord01.xy = vtx_position.xy*textureScale + k_time.x * bumpSpeed;
-  l_bumpCoord01.zw = vtx_position.xy*textureScale * 2.0 + k_time.x * bumpSpeed * 4.0;
-  l_bumpCoord23.xy = vtx_position.xy*textureScale * 4.0 + k_time.x * bumpSpeed * 8.0;
-  l_bumpCoord23.zw = vtx_position.xy;
+  l_bumpCoord01.xy = position*textureScale + k_time.x * bumpSpeed;
+  l_bumpCoord01.zw = position*textureScale * 2.0 + k_time.x * bumpSpeed * 4.0;
+  l_bumpCoord23.xy = position*textureScale * 4.0 + k_time.x * bumpSpeed * 8.0;
+  l_bumpCoord23.zw = position;
 
   // transform vertex position by combined view projection matrix
-    l_position = mul(mat_modelproj, position);
-  l_eyeVector = position - mspos_camera;
+    l_position = mul(mat_modelproj, vtx_position);
+  l_eyeVector = vtx_position - mspos_camera;
 
 
     float4x4 scaleMatrix = { 0.5f, 0.0f, 0.0f, 0.5f,
                            0.0f, 0.5f, 0.0f, 0.5f,
                                  0.0f, 0.0f, 0.5f, 0.5f,
                                  0.0f, 0.0f, 0.0f, 1.0f };
-  l_texcoord0 = mul(mul(scaleMatrix, mat_modelproj), position);
+  l_texcoord0 = mul(mul(scaleMatrix, mat_modelproj), vtx_position);
 }
 
 void fshader(
