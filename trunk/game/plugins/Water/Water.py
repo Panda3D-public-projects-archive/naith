@@ -97,6 +97,8 @@ class Water:
     taskMgr.remove(self.updateTask)
 
   def update(self, task):
+    self.surface.setX(render, base.cam.getX(render))
+    self.surface.setY(render, base.cam.getY(render))
     self.wcamera.setMat(base.cam.getMat(render) * self.wplane.getReflectionMat())
     self.surface.setShaderInput('time', task.time, 0.0, 0, 0)
     return task.cont
