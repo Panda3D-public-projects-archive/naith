@@ -15,7 +15,9 @@
 __all__ = ["Water"]
 import os
 from pandac.PandaModules import HeightfieldTesselator, PNMImage, Filename
-from pandac.PandaModules import BitMask32, TransparencyAttrib, Texture, Plane, PlaneNode, Vec4, Vec3, Point3, NodePath
+from pandac.PandaModules import BitMask32, TransparencyAttrib, Texture
+from pandac.PandaModules import RenderState, CullFaceAttrib
+from pandac.PandaModules import Plane, PlaneNode, Vec4, Vec3, Point3, NodePath
 
 POLYCOUNT = 50000
 SIZE = (256, 256)
@@ -78,7 +80,7 @@ class Water:
     self.wcamera.reparentTo(render)
     self.wcamera.node().setLens(base.camLens)
     self.wcamera.node().setCameraMask(BitMask32.bit(1))
-    #self.wcamera.node().setInitialState(RenderState.make(CullFaceAttrib.makeReverse()))
+    self.wcamera.node().setInitialState(RenderState.make(CullFaceAttrib.makeReverse()))
     self.surface.hide(BitMask32.bit(1))
     wtexture = wbuffer.getTexture()
     wtexture.setWrapU(Texture.WMClamp)
