@@ -18,7 +18,14 @@
     <sunorigin x="-0.647" y="-0.740" z="0.181"/>
     <godrays r="1.0" g="0.8" b="0.25"/>
   </obj>
-
+  
+  <obj type="Clouds" name="clouds">
+    <splat fname="cloud_splat.png"/>
+    <!--<range x1="-100" y1="-100" z1="100" x2="100" y2="100" z2="100"/>-->
+    <cloud filename="cloud2.egg" softness="0.5"/>
+    <!--<cloud filename="test2.egg" pstratus="0.58"/>-->
+  </obj>
+  
   <obj type="Water" name="water">
   </obj>
 
