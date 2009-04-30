@@ -70,6 +70,7 @@ class Sky:
         initstatenode = NodePath('InitialState')
         initstatenode.setColorScale(0, 0, 0, 1, 10000)
         initstatenode.setShaderOff(10000)
+        initstatenode.setLightOff(10000)
         initstatenode.setMaterialOff(10000)
         tagstatenode = NodePath('SunOverrideState')
         tagstatenode.setColorScale(1, 1, 1, 1, 10001)
