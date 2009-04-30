@@ -27,10 +27,9 @@ class PhysicsObject:
 
     # Find all instances of the object to obtain...
     toMake = []
-    isa = xml.find('isa')
-    if isa != None:
+    for isa in xml.findall('isa'):
       level = manager.get(isa.get('source'))
-      toMake = level.getByIsA(isa.get('name'))
+      toMake += level.getByIsA(isa.get('name'))
 
     for inst in xml.findall('instance'):
       # Find <instance> tags that can be used to create instances of the physics object.
