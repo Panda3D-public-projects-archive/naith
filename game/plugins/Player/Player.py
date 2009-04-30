@@ -26,21 +26,21 @@ class Player:
   """A Player class - doesn't actually do that much, just arranges collision detection and provides a camera mount point, plus an interface for the controls to work with. All configured of course."""
   def __init__(self,manager,xml):
     self.manager = manager
-    
+
     # Get the players dimensions, and other stuff...
-    self.height = 1.7
+    self.height = 1.55
     self.crouchHeight = 0.7
     self.radius = 0.3
-    self.headHeight = 1.6
+    self.headHeight = 1.4
     self.crouchHeadHeight = 0.6
     self.crouchSpeed = 4.0
-    
+
     self.playerBaseImpulse = 15000.0 # Always avaliable - air control.
     self.playerImpulse = 75000.0 # Only when on ground
-    
+
     self.jumpForce = 16000.0
     self.jumpThreshold = 0.1 # How long ago the player must of touched the floor for them to be allowed to jump - gives them a bit of lee way.
-    
+
     self.mass = 70.0
     self.airResistance = 9.8/(30.0**2.0) # 30m/s is terminal velocity - not realistic but any faster and we have a problem - could punch through the floor.
 
@@ -66,7 +66,7 @@ class Player:
     self.body.setMass(mass)
     self.body.setPosition(self.stomach.getPos(render))
     self.body.setAutoDisableFlag(False)
-    
+
     # Create a collision object - a capsule - we actually make two - one for standing, the other for crouching...
     self.colStanding = OdeCappedCylinderGeom(self.radius,self.height - self.radius*2.0)
     self.colStanding.setBody(self.body)
@@ -96,7 +96,7 @@ class Player:
     # Need to know if we are crouching or not...
     self.crouching = False
     self.crouchingTarget = False
-    
+
 
     # Arrange for the players stomach to track the players feet. Well, manage most of the physics at any rate...
     def playerTask(task):
@@ -105,7 +105,7 @@ class Player:
       targVel = self.feet.getPos()
       self.feet.setPos(0.0,0.0,0.0)
       dt = globalClock.getDt()
-      
+
       # Find out if the player is touching the floor or not - we check if the bottom hemisphere has touched anything - this uses the lowest collision point callback setup below...
       playerLoc = self.stomach.getPos(render)
       if self.crouching: # radius is reduces below to prevent the player climbing really steep ramps.
@@ -129,7 +129,7 @@ class Player:
       forceCap = self.playerBaseImpulse
       if onFloor: forceCap += self.playerImpulse
       forceCap *= dt # Not really ideal - should really do this per physics step.
-      
+
       force[0] = max(min(force[0],forceCap),-forceCap)
       force[1] = max(min(force[1],forceCap),-forceCap)
       force[2] = 0.0 # Can't fight gravity
@@ -158,7 +158,7 @@ class Player:
         if self.crouchingTarget:
           # Going down - allways possible...
           self.crouching = self.crouchingTarget
-          
+
           self.colStanding.setCategoryBits(BitMask32(0))
           self.colStanding.setCollideBits(BitMask32(0))
           self.colCrouching.setCategoryBits(BitMask32(1))
@@ -177,7 +177,7 @@ class Player:
           space = self.manager.get('ode').getSpace()
           if not ray_cast.collides(space,self.standCheck):
             self.crouching = self.crouchingTarget
-          
+
             self.colStanding.setCategoryBits(BitMask32(1))
             self.colStanding.setCollideBits(BitMask32(1))
             self.colCrouching.setCategoryBits(BitMask32(0))
@@ -268,7 +268,7 @@ class Player:
     else:
       self.neck.setH(0.0)
       self.stomach.setPos(Vec3(0.0,0.0,0.0))
-    
+
     self.stomach.setPos(self.stomach,0.0,0.0,0.5*self.height)
     self.body.setPosition(self.stomach.getPos(render))
     self.body.setLinearVel(Vec3(0.0,0.0,0.0))
