@@ -171,11 +171,20 @@ class Player:
         else:
           # Going up - need to check its safe to do so...
           pos = self.body.getPosition()
-          pos[2] += 0.5*(self.height - self.crouchHeight) - self.radius
-          self.standCheck.setPosition(pos)
 
+          canStand = True
+          pos[2] += self.height - 0.5*self.crouchHeight
           space = self.manager.get('ode').getSpace()
-          if not ray_cast.collides(space,self.standCheck):
+
+          sc = int(math.ceil((self.height-self.crouchHeight)/self.radius))
+          for h in xrange(sc):
+            pos[2] -= self.radius
+            self.standCheck.setPosition(pos)
+            if ray_cast.collides(space,self.standCheck):
+              canStand = False
+              break
+
+          if canStand:
             self.crouching = self.crouchingTarget
 
             self.colStanding.setCategoryBits(BitMask32(1))
