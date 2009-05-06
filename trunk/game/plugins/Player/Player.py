@@ -230,18 +230,10 @@ class Player:
 
     # To know if the player is on the floor or airborne we have to intecept collisions between the players capsule and everything else...
     def onPlayerCollide(entry,which):
-      try:
-        # 1.6.0 code...
-        for i in xrange(entry.getNumContactPoints()):
-          v = entry.getContactPoint(i)
-          if self.lowVert==None or self.lowVert[2]>v[2]:
-            self.lowVert = v
-      except:
-        # 1.6.1 code...
-        for i in xrange(entry.getNumContacts()):
-          v = entry.getContactPoint(i)
-          if self.lowVert==None or self.lowVert[2]>v[2]:
-            self.lowVert = v
+      for i in xrange(entry.getNumContacts()):
+        v = entry.getContactPoint(i)
+        if self.lowVert==None or self.lowVert[2]>v[2]:
+          self.lowVert = v
 
     ode.regCollisionCB(self.colStanding,onPlayerCollide)
     ode.regCollisionCB(self.colCrouching,onPlayerCollide)
