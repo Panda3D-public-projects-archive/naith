@@ -108,7 +108,11 @@ class SimpleWeapon:
             sparkDir = (norm * (2.0*norm.dot(rd))) - rd
             
             # Convert the reflection direction into a quaternion that will rotate +ve z to the required direction...
-            ang = -math.acos(Vec3(0.0,0.0,1.0).dot(sparkDir))
+            try:
+              ang = -math.acos(sparkDir[2])
+            except:
+              print 'Angle problem', sparkDir
+              ang = 0.0
             axis = Vec3(0.0,0.0,1.0).cross(sparkDir)
             axis.normalize()
             sparkQuat = Quat()
