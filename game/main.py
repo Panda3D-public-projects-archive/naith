@@ -17,8 +17,9 @@
 # Entry point - sets up the plugin system by giving it the config file to load and then releases panda to do its thing...
 
 # Important: this must be first
-from pandac.PandaModules import loadPrcFile
+from pandac.PandaModules import loadPrcFile, loadPrcFileData
 loadPrcFile("config/settings.prc")
+loadPrcFileData("window-disable", "window-type none")
 import direct.directbase.DirectStart
 from direct.task import Task
 
