@@ -1,4 +1,4 @@
-# Copyright Tom SF Haines
+# Copyright Reinier de Blois
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,25 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from pandac.PandaModules import *
+from direct.directbase import DirectStart
 
-
-import sys
-from direct.showbase import DirectObject
-
-
-class Screenshot(DirectObject.DirectObject):
-  """Captures a screenshot."""
-  def __init__(self,manager,xml):
-    pass
+class Window:
+  """This plugin creates a window for rendering into."""
+  def __init__(self, manager, xml):
+    base.openDefaultWindow()
+    if base.win.getFbProperties().getMultisamples() > 0:
+      render.setAntialias(AntialiasAttrib.MAuto)
 
   def screenshot(self):
       base.screenshot()
 
-  def start(self):
-    self.accept('f11',self.screenshot)
-
-  def stop(self):
-    self.ignore('f11')
-
-  def reload(self,manager,xml):
-    pass

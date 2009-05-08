@@ -41,13 +41,6 @@ class Camera:
     if track!=None:
       base.camera.reparentTo(manager.get(track.get('plugin')).getNode(track.get('node')))
 
-    # Check if antialiasing should be enabled
-    antialias = xml.find('antialias')
-    if antialias!=None:
-      render.setAntialias(AntialiasAttrib.MAuto)
-    else:
-      render.setAntialias(AntialiasAttrib.MNone)
-
     # Get the zooming parameters, used to set how the normal field of view and the field of view used when the player looks down the weapon...
     fov = xml.find('fov')
     self.zoomed = False

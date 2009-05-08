@@ -1,7 +1,10 @@
 <config>
+  <obj type="Window" name="window">
+    <antialias/>
+  </obj>
+
   <obj type="EscExit" name="esc_exit"/>
   <obj type="FrameRate" name="frame_rate"/>
-  <obj type="Screenshot" name="screenshot"/>
   <obj type="Profile" name="profile"/>
 
   <obj type="Global" name="paths">
@@ -32,7 +35,6 @@
   <obj type="Camera" name="camera">
     <fov deg="70" zoom="40" zoomTime="0.1" near="0.05" far="12800.0"/>
     <track plugin="player" node="view"/>
-    <antialias/>
   </obj>
 
   <obj type="SimpleWeapon" name="weapon">
@@ -60,5 +62,6 @@
 
   <obj type="MethodOnKey" name="playerReset">
     <action key="f9" plugin="player" method="reset"/>
+    <action key="f11" plugin="window" method="screenshot"/>
   </obj>
 </config>
