@@ -32,7 +32,11 @@ import sys
 plugin = Manager()
 
 def firstLight(task):
-  cn = sys.argv[1]
+  if len(sys.argv)>1:
+    cn = sys.argv[1]
+  else:
+    cn = 'start'
+  
   print 'Starting configuration', cn
   plugin.transition(cn)
   return Task.done

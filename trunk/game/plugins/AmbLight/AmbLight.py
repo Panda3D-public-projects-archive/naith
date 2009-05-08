@@ -20,11 +20,19 @@ class AmbLight:
   """Creates a simple ambient light"""
   def __init__(self,manager,xml):
     self.light = PAmbientLight('alight')
+    self.lightNode = render.attachNewNode(self.light)
 
+    self.reload(manager,xml)
+
+
+  def reload(self,manager,xml):
     color = xml.find('color')
     if color!=None:
-      self.light.setColor(VBase4(float(color.get('r')),float(color.get('g')),float(color.get('b')),1.0))
+      self.light.setColor(VBase4(float(color.get('r')), float(color.get('g')), float(color.get('b')), 1.0))
 
-    self.lightNode = render.attachNewNode(self.light)
-    
+
+  def start(self):
     render.setLight(self.lightNode)
+
+  def stop(self):
+    render.clearLight(self.lightNode)
