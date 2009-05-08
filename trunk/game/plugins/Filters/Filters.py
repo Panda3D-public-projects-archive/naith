@@ -1,4 +1,4 @@
-# Copyright Reinier de Blois
+# Copyright Reinier de Blois, Tom SF Haines
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,20 +19,52 @@ from direct.filter.CommonFilters import CommonFilters
 class Filters:
   """Class handles postprocessing filters and effects"""
   def __init__(self,manager,xml):
-    self.cf = CommonFilters(base.win, base.cam)
+    self.cf = CommonFilters(base.win,base.cam)
+    self.reload(manager,xml)
 
+
+  def reload(self,manager,xml):
     hdr = xml.find('hdr')
     if hdr!=None:
-      hdrtype = hdr.get('type')
-      assert hdrtype in ['0', '1', '2']
-      render.setAttrib(getattr(LightRampAttrib, "makeHdr" + hdrtype)())
+      self.hdrtype = hdr.get('type')
+      assert self.hdrtype in ['0', '1', '2']
+    else:
+      self.hdrtype = None
 
-    perpixel = xml.find('perpixel')
-    if perpixel!=None:
-      render.setShaderAuto()
+    self.perpixel =  xml.find('perpixel')!=None
 
     bloom = xml.find('bloom')
     if bloom!=None:
-      self.cf.setBloom(size=bloom.get('size', 'medium'))
+      self.bloomSize = bloom.get('size', 'medium')
+    else:
+      self.bloomSize = None
 
-    base.bufferViewer.toggleEnable()
+    self.showbuffers = xml.find('showbuffers')!=None
+
+
+  def start(self):
+    if self.hdrtype!=None:
+      render.setAttrib(getattr(LightRampAttrib, "makeHdr" + self.hdrtype)())
+
+    if self.perpixel:
+      render.setShaderAuto()
+
+    if self.bloomSize!=None:
+      self.cf.setBloom(size=self.bloomSize)
+
+    if self.showbuffers:
+      base.bufferViewer.toggleEnable()
+
+
+  def stop(self):
+    if self.hdrtype!=None:
+      render.clearAttrib(LightRampAttrib.getClassType())
+
+    if self.perpixel:
+      render.setShaderOff()
+    
+    if self.bloomSize!=None:
+      self.cf.delBloom()
+    
+    if self.showbuffers:
+      base.bufferViewer.toggleEnable()

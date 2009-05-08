@@ -29,4 +29,10 @@
   </obj>
 
   <obj type="Include" config="objects"/>
+
+  <obj type="Filters" config="filters">
+    <hdr type="1"/>
+    <perpixel/>
+    <bloom size="medium"/>
+  </obj>
 </config>
