@@ -15,7 +15,6 @@
 
 
 from pandac.PandaModules import *
-#import direct.directbase.DirectStart
 
 
 class Camera:
@@ -24,6 +23,7 @@ class Camera:
     base.camNode.setCameraMask(BitMask32.bit(0))
     base.disableMouse()
     self.reload(manager,xml)
+
 
   def reload(self,manager,xml):
     # Set the cameras initial position from the configuration file - only matters if the camera isn't about to be made a child of node to be controlled elsewhere...

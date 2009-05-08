@@ -27,6 +27,10 @@ class KeysFPS(DirectObject.DirectObject):
     self.left = 0
     self.right = 0
 
+    self.reload(manager,xml)
+
+
+  def reload(self,manager,xml):
     # Get the node to update...
     offset = xml.find('offset')
     if offset!=None:
@@ -55,9 +59,6 @@ class KeysFPS(DirectObject.DirectObject):
 
     # Get the weapon object to control...
     self.weapon = manager.get(xml.find('weapon').get('plugin'))
-    
-    # Setup the task that updates feet to be relative to whatever in terms of velocity...
-    taskMgr.add(self.keysTask,'Keys',sort=-100)
 
 
   def keysTask(self,task):
@@ -143,14 +144,16 @@ class KeysFPS(DirectObject.DirectObject):
     self.accept('control-mouse3',self.aim)
     self.accept('control-mouse3-up',self.relax)
 
+    # Setup the task that updates feet to be relative to whatever in terms of velocity...
+    self.task = taskMgr.add(self.keysTask,'Keys',sort=-100)
+
   def stop(self):
+    taskMgr.remove(self.task)
+    self.task = None
+    
     self.ignoreAll()
 
     self.forward = 0
     self.backward = 0
     self.left = 0
     self.right = 0
-
-
-  def reload(self,manager,xml):
-    pass # Wrong due to references of other objects taken

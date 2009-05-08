@@ -21,22 +21,21 @@ import direct.directbase.DirectStart
 class MouseFPS:
   """Provides fps style mouse control, sending the data to arbitary nodes"""
   def __init__(self,manager,xml):
-    # First get rid of the mouse cursor...
-    props = WindowProperties()
-    props.setCursorHidden(True)
-    base.win.requestProperties(props)
+    self.reload(manager,xml)
 
+
+  def reload(self,manager,xml):
     # Variables needed by mouse simulation...
     self.originX = 0
     self.originY = 0
     self.speed = 0.1
     self.minY = -45.0
     self.maxY = 45.0
-    
+
     speed = xml.find('speed')
     if speed!=None:
       self.speed = float(speed.get('val'))
-    
+
     # Get the nodes to be updated by the mouse movement...
     xRot = xml.find('x-rot')
     if xRot!=None:
@@ -52,8 +51,25 @@ class MouseFPS:
     else:
       self.yNode = None
 
+
+  def start(self):
+    # Get rid of the mouse cursor...
+    props = WindowProperties()
+    props.setCursorHidden(True)
+    base.win.requestProperties(props)
+
     # Set the mouse task going...
-    taskMgr.add(self.mouseTask,'Mouse',sort=-100)
+    self.task = taskMgr.add(self.mouseTask,'Mouse',sort=-100)
+
+  def stop(self):
+    # Re-enable the mouse cursor...
+    props = WindowProperties()
+    props.setCursorHidden(False)
+    base.win.requestProperties(props)
+
+    # Stop the mouse task...
+    taskMgr.remove(self.task)
+    self.task = None
 
 
   def mouseTask(self,task):

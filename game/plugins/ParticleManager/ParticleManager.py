@@ -26,11 +26,15 @@ class ParticleManager:
   """Simple particle system wrapper - put here in the hope that latter on a better way of doing things will exist and this will make the swap out easy."""
   def __init__(self,manager,xml):
     # Get the particle system path...
-    basePath = manager.get('paths').getConfig().find('particles').get('path')
+    self.basePath = manager.get('paths').getConfig().find('particles').get('path')
     
     # Enable the particle system...
     base.enableParticles()
 
+    self.reload(manager,xml)
+
+
+  def reload(self,manager,xml):
     # Generate a database of particle effects from the xml - this consists of a name to request the effect by, a configuration file to load and how long to let it live before destroying it. (If omited it will live until a stop.)
     self.pdb = dict()
     for effect in xml.findall('effect'):
@@ -38,11 +42,19 @@ class ParticleManager:
       new['name'] = effect.get('name')
       self.pdb[new['name']] = new
 
-      new['file'] = os.path.join(basePath,effect.get('file'))
+      new['file'] = os.path.join(self.basePath,effect.get('file'))
       new['life'] = effect.get('lifetime',None)
 
     # This stores all current particle effects, indexed by their id - used by stop to end it all...
     self.effects = dict()
+
+
+  def stop(self):
+    # Kill all running effects - as these are meant to be 'fire once' particle effects this makes sense...
+    for key,pn in self.effects.iteritems():
+      pn[0].cleanup()
+      pn[0].remove()
+      pn[1].removeNode()
 
 
   def doEffect(self,name,source,track = False,pos = None,quat = None):
@@ -77,8 +89,10 @@ class ParticleManager:
     if self.pdb[name]['life']!=None:
       def kill(p):
         if self.effects.has_key(id(p)):
-          self.effects[id(p)][0].cleanup()
-          self.effects[id(p)][0].remove()
+          pn = self.effects[id(p)]
+          pn[0].cleanup()
+          pn[0].remove()
+          pn[1].removeNode()
           del self.effects[id(p)]
       s = Sequence(Wait(float(self.pdb[name]['life'])),Func(kill,p))
       s.start()
