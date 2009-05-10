@@ -25,42 +25,105 @@ import ray_cast
 class Player:
   """A Player class - doesn't actually do that much, just arranges collision detection and provides a camera mount point, plus an interface for the controls to work with. All configured of course."""
   def __init__(self,manager,xml):
+    # Create the nodes...
+    self.stomach = render.attachNewNode('player-stomach')
+    self.feet = self.stomach.attachNewNode('player-feet')
+    self.neck = self.stomach.attachNewNode('player-neck')
+    self.view = self.neck.attachNewNode('player-head')
+
+    # Other variables...
+    self.body = None
+    self.colStanding = None
+    self.colCrouching = None
+    self.standCheck = None
+
+    # Do the setup code...
+    self.reload(manager,xml)
+
+
+  def destroy(self):
+    self.stomach.removeNode()
+    self.feet.removeNode()
+    self.neck.removeNode()
+    self.view.removeNode()
+    
+    if self.body!=None:
+      self.body.destroy()
+    if self.colStanding!=None:
+      self.colStanding.destroy()
+    if self.colCrouching!=None:
+      self.colCrouching.destroy()
+    if self.standCheck!=None:
+      self.standCheck.destroy()
+
+
+  def reload(self,manager,xml):
     self.manager = manager
 
-    # Get the players dimensions, and other stuff...
-    self.height = 1.55
-    self.crouchHeight = 0.7
-    self.radius = 0.3
-    self.headHeight = 1.4
-    self.crouchHeadHeight = 0.6
-    self.crouchSpeed = 4.0
+    # Get the players dimensions...
+    size = xml.find('size')
+    if size!=None:
+      self.height = float(size.get('height',1.55))
+      self.crouchHeight = float(size.get('crouchHeight',0.7))
+      self.radius = float(size.get('radius', 0.3))
+      self.headHeight = float(size.get('headHeight',1.4))
+      self.crouchHeadHeight = float(size.get('crouchHeadHeight',0.6))
+    else:
+      self.height = 1.55
+      self.crouchHeight = 0.7
+      self.radius = 0.3
+      self.headHeight = 1.4
+      self.crouchHeadHeight = 0.6
 
-    self.playerBaseImpulse = 15000.0 # Always avaliable - air control.
-    self.playerImpulse = 75000.0 # Only when on ground
+    # Get the players power...
+    power = xml.find('power')
+    if power!=None:
+      self.playerBaseImpulse = float(power.get('baseImpulse',15000.0))
+      self.playerImpulse = float(power.get('feetImpulse',75000.0))
+      self.crouchSpeed = float(power.get('crouchSpeed',4.0))
+      self.jumpForce = float(power.get('jumpForce',16000.0))
+      self.jumpThreshold = float(power.get('jumpLeeway',0.1))
+    else:
+      self.playerBaseImpulse = 15000.0 # Always avaliable - air control.
+      self.playerImpulse = 75000.0 # Only when on ground
+      self.crouchSpeed = 4.0
+      self.jumpForce = 16000.0
+      self.jumpThreshold = 0.1 # How long ago the player must of touched the floor for them to be allowed to jump - gives them a bit of lee way an copes with physics system jitter.
 
-    self.jumpForce = 16000.0
-    self.jumpThreshold = 0.1 # How long ago the player must of touched the floor for them to be allowed to jump - gives them a bit of lee way.
+    # Get the players mass and terminal velocity...
+    body = xml.find('body')
+    if body!=None:
+      self.mass = float(body.get('mass',70.0))
+      self.airResistance = 9.8/(float(body.get('mass',30.0))**2.0)
+    else:
+      self.mass = 70.0
+      self.airResistance = 9.8/(30.0**2.0)
 
-    self.mass = 70.0
-    self.airResistance = 9.8/(30.0**2.0) # 30m/s is terminal velocity - not realistic but any faster and we have a problem - could punch through the floor.
 
-    # Create the players stomach node path - this is in the centre of the player, and is used by the collision system...
-    self.stomach = render.attachNewNode('player-stomach')
+    # Setup the node positions...
     self.stomach.setPos(render,0.0,0.0,0.5*self.height)
-
-    # Create the players feet node path - this is the node path updated by the rotation and movement controls...
-    self.feet = self.stomach.attachNewNode('player-feet')
-
-    # Create the players neck node - this rotates, the body follows...
-    self.neck = self.stomach.attachNewNode('player-neck')
-
-    # Create the players head node path, where the players head is - used to get the view in the right position...
-    self.view = self.neck.attachNewNode('player-head')
     self.view.setPos(render,0.0,0.0,0.0 + self.headHeight)
 
+    # Get the physics object...
+    physics = xml.find('physics')
+    if physics!=None:
+      odeName = physics.get('plugin','ode')
+    else:
+      odeName = 'ode'
+    self.ode = manager.get(odeName)
+
+    # Clean up any previous collision objects...
+    if self.body!=None:
+      self.body.destroy()
+    if self.colStanding!=None:
+      self.colStanding.destroy()
+    if self.colCrouching!=None:
+      self.colCrouching.destroy()
+    if self.standCheck!=None:
+      self.standCheck.destroy()
+
     # Setup the body...
-    ode = manager.get('ode')
-    self.body = OdeBody(ode.getWorld())
+    self.body = OdeBody(self.ode.getWorld())
     mass = OdeMass()
     mass.setCapsuleTotal(self.mass,3,self.radius,self.height - self.radius*2.0)
     self.body.setMass(mass)
@@ -72,15 +135,15 @@ class Player:
     self.colStanding.setBody(self.body)
     self.colStanding.setCategoryBits(BitMask32(1))
     self.colStanding.setCollideBits(BitMask32(1))
-    ode.getSpace().add(self.colStanding)
-    ode.getSpace().setSurfaceType(self.colStanding,ode.getSurface('player'))
+    self.ode.getSpace().add(self.colStanding)
+    self.ode.getSpace().setSurfaceType(self.colStanding,self.ode.getSurface('player'))
 
     self.colCrouching = OdeCappedCylinderGeom(self.radius,self.crouchHeight - self.radius*2.0)
     self.colCrouching.setBody(self.body)
     self.colCrouching.setCategoryBits(BitMask32(0))
     self.colCrouching.setCollideBits(BitMask32(0))
-    ode.getSpace().add(self.colCrouching)
-    ode.getSpace().setSurfaceType(self.colCrouching,ode.getSurface('player'))
+    self.ode.getSpace().add(self.colCrouching)
+    self.ode.getSpace().setSurfaceType(self.colCrouching,self.ode.getSurface('player'))
 
     # Create a collision object ready for use when checking if the player can stand up or not - just a sphere with the relevant radius...
     self.standCheck = OdeSphereGeom(self.radius)
@@ -98,166 +161,160 @@ class Player:
     self.crouchingTarget = False
 
 
-    # Arrange for the players stomach to track the players feet. Well, manage most of the physics at any rate...
-    def playerTask(task):
-      # Get the stuff we need - current velocity, target velocity and length of time step...
-      vel = self.body.getLinearVel()
-      targVel = self.feet.getPos()
-      self.feet.setPos(0.0,0.0,0.0)
-      dt = globalClock.getDt()
+  def playerTask(self,task):
+    # Do lots of player calculation stuff - this includes movememnt forces, crouching etc...
+    
+    # Get the stuff we need - current velocity, target velocity and length of time step...
+    vel = self.body.getLinearVel()
+    targVel = self.feet.getPos()
+    self.feet.setPos(0.0,0.0,0.0)
+    dt = globalClock.getDt()
 
-      # Find out if the player is touching the floor or not - we check if the bottom hemisphere has touched anything - this uses the lowest collision point callback setup below...
-      playerLoc = self.stomach.getPos(render)
-      if self.crouching: # radius is reduces below to prevent the player climbing really steep ramps.
-        playerKneeHeight = playerLoc[2] - self.crouchHeight*0.5 + self.radius*0.75
+    # Find out if the player is touching the floor or not - we check if the bottom hemisphere has touched anything - this uses the lowest collision point callback setup below...
+    playerLoc = self.stomach.getPos(render)
+    if self.crouching: # radius is reduces below to prevent the player climbing really steep ramps.
+      playerKneeHeight = playerLoc[2] - self.crouchHeight*0.5 + self.radius*0.75
+    else:
+      playerKneeHeight = playerLoc[2] - self.height*0.5 + self.radius*0.75
+    if (self.lowVert!=None) and (self.lowVert[2]<playerKneeHeight):
+      self.lastOnFloor = 0.0
+    else:
+      self.lastOnFloor += dt
+    onFloor = self.lastOnFloor<self.jumpThreshold
+
+    # Update feet direction to be pointing in the same direction as the neck - so we walk forwards...
+    self.feet.setQuat(self.neck.getQuat())
+
+    # Calculate the total force we would *like* to apply...
+    force = targVel - vel
+    force *= self.mass/dt
+
+    # Cap the liked force by how strong the player actually is...
+    forceCap = self.playerBaseImpulse
+    if onFloor: forceCap += self.playerImpulse
+    forceCap *= dt # Not really ideal - should really do this per physics step.
+
+    force[0] = max(min(force[0],forceCap),-forceCap)
+    force[1] = max(min(force[1],forceCap),-forceCap)
+    force[2] = 0.0 # Can't fight gravity
+
+    # Add to the liked force any pending jump, if allowed...
+    if self.doJump and onFloor and not self.midJump:
+      force[2] += self.jumpForce
+      self.midJump = True
+    self.doJump = False
+
+    # Apply air resistance to the player - only for falling - air resistance is direction dependent!
+    if vel[2]<0.0:
+      force[2] -= self.airResistance*vel[2]*vel[2]
+      self.midJump = False
+
+    # Apply the force...
+    self.body.addForce(force)
+
+    # Simple hack to limit how much air the player gets off the top of ramps - need a better solution. It still allows for some air and other solutions involve the player punching through ramps...
+    if (not onFloor) and (not self.midJump) and (vel[2]>0.0):
+      vel[2] = 0.0
+      self.body.setLinearVel(vel)
+
+    # Crouching - this switches between the two cylinders immediatly on a mode change...
+    if self.crouching!=self.crouchingTarget:
+      if self.crouchingTarget:
+        # Going down - allways possible...
+        self.crouching = self.crouchingTarget
+
+        self.colStanding.setCategoryBits(BitMask32(0))
+        self.colStanding.setCollideBits(BitMask32(0))
+        self.colCrouching.setCategoryBits(BitMask32(1))
+        self.colCrouching.setCollideBits(BitMask32(1))
+
+        offset = Vec3(0.0,0.0,0.5*(self.crouchHeight-self.height))
+        self.body.setPosition(self.body.getPosition() + offset)
+        self.stomach.setPos(self.stomach,offset)
+        self.view.setPos(self.view,-offset)
       else:
-        playerKneeHeight = playerLoc[2] - self.height*0.5 + self.radius*0.75
-      if (self.lowVert!=None) and (self.lowVert[2]<playerKneeHeight):
-        self.lastOnFloor = 0.0
-      else:
-        self.lastOnFloor += dt
-      onFloor = self.lastOnFloor<self.jumpThreshold
+        # Going up - need to check its safe to do so...
+        pos = self.body.getPosition()
 
-      # Update feet direction to be pointing in the same direction as the neck - so we walk forwards...
-      self.feet.setQuat(self.neck.getQuat())
+        canStand = True
+        pos[2] += self.height - 0.5*self.crouchHeight
+        space = self.ode.getSpace()
 
-      # Calculate the total force we would *like* to apply...
-      force = targVel - vel
-      force *= self.mass/dt
+        sc = int(math.ceil((self.height-self.crouchHeight)/self.radius))
+        for h in xrange(sc): # This is needed as a cylinder can miss collisions if tested this way.
+          pos[2] -= self.radius
+          self.standCheck.setPosition(pos)
+          if ray_cast.collides(space,self.standCheck):
+            canStand = False
+            break
 
-      # Cap the liked force by how strong the player actually is...
-      forceCap = self.playerBaseImpulse
-      if onFloor: forceCap += self.playerImpulse
-      forceCap *= dt # Not really ideal - should really do this per physics step.
-
-      force[0] = max(min(force[0],forceCap),-forceCap)
-      force[1] = max(min(force[1],forceCap),-forceCap)
-      force[2] = 0.0 # Can't fight gravity
-
-      # Add to the liked force any pending jump, if allowed...
-      if self.doJump and onFloor and not self.midJump:
-        force[2] += self.jumpForce
-        self.midJump = True
-      self.doJump = False
-
-      # Apply air resistance to the player - only for falling - air resistance is direction dependent!
-      if vel[2]<0.0:
-        force[2] -= self.airResistance*vel[2]*vel[2]
-        self.midJump = False
-
-      # Apply the force...
-      self.body.addForce(force)
-
-      # Simple hack to limit how much air the player gets off the top of ramps - need a better solution. It still allows for some air and other solutions involve the player punching through ramps...
-      if (not onFloor) and (not self.midJump) and (vel[2]>0.0):
-        vel[2] = 0.0
-        self.body.setLinearVel(vel)
-
-      # Crouching - this switches between the two cylinders immediatly on a mode change...
-      if self.crouching!=self.crouchingTarget:
-        if self.crouchingTarget:
-          # Going down - allways possible...
+        if canStand:
           self.crouching = self.crouchingTarget
 
-          self.colStanding.setCategoryBits(BitMask32(0))
-          self.colStanding.setCollideBits(BitMask32(0))
-          self.colCrouching.setCategoryBits(BitMask32(1))
-          self.colCrouching.setCollideBits(BitMask32(1))
+          self.colStanding.setCategoryBits(BitMask32(1))
+          self.colStanding.setCollideBits(BitMask32(1))
+          self.colCrouching.setCategoryBits(BitMask32(0))
+          self.colCrouching.setCollideBits(BitMask32(0))
 
-          offset = Vec3(0.0,0.0,0.5*(self.crouchHeight-self.height))
+          offset = Vec3(0.0,0.0,0.5*(self.height-self.crouchHeight))
           self.body.setPosition(self.body.getPosition() + offset)
           self.stomach.setPos(self.stomach,offset)
           self.view.setPos(self.view,-offset)
-        else:
-          # Going up - need to check its safe to do so...
-          pos = self.body.getPosition()
 
-          canStand = True
-          pos[2] += self.height - 0.5*self.crouchHeight
-          space = self.manager.get('ode').getSpace()
+    # Crouching - this makes the height height head towards the correct height, to give the perception that crouching takes time...
+    currentHeight = self.view.getZ() - self.neck.getZ()
+    if self.crouching:
+      targetHeight = self.crouchHeadHeight - 0.5*self.crouchHeight
+      newHeight = max(targetHeight,currentHeight - self.crouchSpeed * dt)
+    else:
+      targetHeight = self.headHeight - 0.5*self.height
+      newHeight = min(targetHeight,currentHeight + self.crouchSpeed * dt)
+    self.view.setZ(newHeight)
 
-          sc = int(math.ceil((self.height-self.crouchHeight)/self.radius))
-          for h in xrange(sc):
-            pos[2] -= self.radius
-            self.standCheck.setPosition(pos)
-            if ray_cast.collides(space,self.standCheck):
-              canStand = False
-              break
-
-          if canStand:
-            self.crouching = self.crouchingTarget
-
-            self.colStanding.setCategoryBits(BitMask32(1))
-            self.colStanding.setCollideBits(BitMask32(1))
-            self.colCrouching.setCategoryBits(BitMask32(0))
-            self.colCrouching.setCollideBits(BitMask32(0))
-
-            offset = Vec3(0.0,0.0,0.5*(self.height-self.crouchHeight))
-            self.body.setPosition(self.body.getPosition() + offset)
-            self.stomach.setPos(self.stomach,offset)
-            self.view.setPos(self.view,-offset)
-
-      # Crouching - this makes the height height head towards the correct height, to give the perception that crouching takes time...
-      currentHeight = self.view.getZ() - self.neck.getZ()
-      if self.crouching:
-        targetHeight = self.crouchHeadHeight - 0.5*self.crouchHeight
-        newHeight = max(targetHeight,currentHeight - self.crouchSpeed * dt)
-      else:
-        targetHeight = self.headHeight - 0.5*self.height
-        newHeight = min(targetHeight,currentHeight + self.crouchSpeed * dt)
-      self.view.setZ(newHeight)
-
-      return task.cont
-
-    taskMgr.add(playerTask,'Player')
+    return task.cont
 
 
-    # Need a pre-collision thing going, to reset the position the player is effectivly standing on...
-    def playerStandReset():
-      self.lowVert = None
-
-    ode.regPreFunc('playerStandReset',playerStandReset)
+  def playerPrePhysics(self):
+    # Pre collision - we have to reset the record of the lowest point the player is standing on ready for the collision callbacks to recalculate it...
+    self.lowVert = None
 
 
-    # We also need the player to stay upright - for stability this must be updated after every physics time step rather than every frame, we also take this opportunity to move the stomach to match the collision object...
-    def playerStandUp():
-      self.body.setQuaternion(Quat())
-      self.body.setTorque(0.0,0.0,0.0)
-      self.stomach.setPos(render,self.body.getPosition())
-
-    ode.regPostFunc('playerStandUp',playerStandUp)
+  def playerPostPhysics(self):
+    # Stop the player falling over, update the node position to match...
+    self.body.setQuaternion(Quat())
+    self.body.setTorque(0.0,0.0,0.0)
+    self.stomach.setPos(render,self.body.getPosition())
 
 
-    # To know if the player is on the floor or airborne we have to intecept collisions between the players capsule and everything else...
-    def onPlayerCollide(entry,which):
-      for i in xrange(entry.getNumContacts()):
-        v = entry.getContactPoint(i)
-        if self.lowVert==None or self.lowVert[2]>v[2]:
-          self.lowVert = v
-
-    ode.regCollisionCB(self.colStanding,onPlayerCollide)
-    ode.regCollisionCB(self.colCrouching,onPlayerCollide)
+  def onPlayerCollide(self,entry,which):
+    # Handles the players collisions - used to work out the lowest point the player is in contact with, to determine if they are standing on the floor or not...
+    for i in xrange(entry.getNumContacts()):
+      v = entry.getContactPoint(i)
+      if self.lowVert==None or self.lowVert[2]>v[2]:
+        self.lowVert = v
 
 
   def start(self):
     self.reset()
+    
+    # Arrange all the tasks/callbacks required...
+    self.task = taskMgr.add(self.playerTask, 'PlayerTask')
+    self.ode.regPreFunc('playerPrePhysics', self.playerPrePhysics)
+    self.ode.regPostFunc('playerPostPhysics', self.playerPostPhysics)
+
+    # To know if the player is on the floor or airborne we have to intecept collisions between the players capsules and everything else...
+    self.ode.regCollisionCB(self.colStanding, self.onPlayerCollide)
+    self.ode.regCollisionCB(self.colCrouching, self.onPlayerCollide)
 
 
-  def crouch(self):
-    """Makes the player crouch, unless they are already doing so."""
-    self.crouchingTarget = True
+  def stop(self):
+    taskMgr.remove(self.task)
+    self.ode.unregPreFunc('playerPrePhysics')
+    self.ode.unregPostFunc('playerPostPhysics')
 
-  def standup(self):
-    """Makes the player stand up from crouching."""
-    self.crouchingTarget = False
+    self.ode.unregCollisionCB(self.colStanding)
+    self.ode.unregCollisionCB(self.colCrouching)
 
-  def isCrouched(self):
-    """Tells you if the player is crouching or not."""
-    return self.crouching
-
-  def jump(self):
-    """Makes the player jump - only works when the player is touching the ground."""
-    self.doJump = True
 
   def reset(self):
     """Resets the player back to their starting position. (Leaves rotation alone - this is for debuging falling out the level kinda stuff.)"""
@@ -273,6 +330,24 @@ class Player:
     self.stomach.setPos(self.stomach,0.0,0.0,0.5*self.height)
     self.body.setPosition(self.stomach.getPos(render))
     self.body.setLinearVel(Vec3(0.0,0.0,0.0))
+
+
+  def crouch(self):
+    """Makes the player crouch, unless they are already doing so."""
+    self.crouchingTarget = True
+
+  def standup(self):
+    """Makes the player stand up from crouching."""
+    self.crouchingTarget = False
+
+  def isCrouched(self):
+    """Tells you if the player is crouching or not."""
+    return self.crouching
+
+
+  def jump(self):
+    """Makes the player jump - only works when the player is touching the ground."""
+    self.doJump = True
 
 
   def getNode(self,name):

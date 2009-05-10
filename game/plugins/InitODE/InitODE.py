@@ -25,9 +25,15 @@ class InitODE(DirectObject.DirectObject):
   """This creates the various ODE core objects, and exposes them to other plugins. Should be called ode."""
   def __init__(self,manager,xml):
     # Setup the physics world...
+    erp = float(xml.find('param').get('erp',0.8))
+    cfm = float(xml.find('param').get('cfm',1e-3))
+    slip = float(xml.find('param').get('slip',0.0))
+    dampen = float(xml.find('param').get('dampen',0.1))
+    
     self.world = OdeWorld()
-    self.world.setGravity(0.0,0.0,-9.81) # This should really come from the config file.
-    self.world.setErp(0.8)
+    self.world.setGravity(float(xml.find('gravity').get('x',0.0)), float(xml.find('gravity').get('y',0.0)), float(xml.find('gravity').get('z',-9.81)))
+    self.world.setErp(erp)
+    self.world.setCfm(cfm)
     self.world.setAutoDisableFlag(True)
 
     # Create a surface table - contains interactions between different surface types - loaded from config file...
@@ -43,14 +49,14 @@ class InitODE(DirectObject.DirectObject):
       mu = float(surElem[a].get('mu'))
       bounce = float(surElem[a].get('bounce'))
       absorb = float(surElem[a].get('absorb'))
-      self.world.setSurfaceEntry(a,a,mu,bounce,absorb,0.8,1e-3,0.0,0.1)
+      self.world.setSurfaceEntry(a,a,mu,bounce,absorb,erp,cfm,slip,dampen)
 
       # Interaction with other surfaces...
       for b in xrange(a+1,len(surElem)):
         mu = float(surElem[a].get('mu')) * float(surElem[b].get('mu'))
         bounce = float(surElem[a].get('bounce')) * float(surElem[b].get('bounce'))
         absorb = float(surElem[a].get('absorb')) + float(surElem[b].get('absorb'))
-        self.world.setSurfaceEntry(a,b,mu,bounce,absorb,0.8,1e-3,0.0,0.1)
+        self.world.setSurfaceEntry(a,b,mu,bounce,absorb,erp,cfm,slip,dampen)
 
     # Create a space to manage collisions...
     self.space = OdeHashSpace()
@@ -59,6 +65,7 @@ class InitODE(DirectObject.DirectObject):
     # Setup a contact group to handle collision events...
     self.contactGroup = OdeJointGroup()
     self.space.setAutoCollideJointGroup(self.contactGroup)
+
 
     # Create the synch database - this is a database of NodePath and ODEBodys - each frame the NodePaths have their positions synched with the ODEBodys...
     self.synch = dict() # dict of tuples (node,body), indexed by an integer that is written to the NodePath as a integer using setPythonTag into 'ode_key'
@@ -70,74 +77,77 @@ class InitODE(DirectObject.DirectObject):
 
     # Create the damping database - damps objects so that they slow down over time, which is very good for stability...
     self.damping = dict() # id(body) -> (body,amount)
-    
 
-    # Arrange for the physics simulation to run on automatic - start and stop are used to enable/disable it however...
-    self.runSim = False
+    # Variables for the physics simulation to run on automatic - start and stop are used to enable/disable it however...
     self.timeRem = 0.0
     self.step = 1.0/50.0
     
-    def simulationTask(task):
-      if self.runSim:
-        # Step the simulation and set the new positions - fixed time step...
-        self.timeRem += globalClock.getDt()
-        while self.timeRem>self.step:
-          # Call the pre-collision functions...
-          for ident,func in self.preCollide.iteritems():
-            func()
-
-          # Apply damping to all objects in damping db...
-          for key,data in self.damping.iteritems():
-            if data[0].isEnabled():
-              vel = data[0].getLinearVel()
-              vel *= -data[1]
-              data[0].addForce(vel)
-              rot = data[0].getAngularVel()
-              rot *= -data[2]
-              data[0].addTorque(rot)
-          
-          # A single step of collision detection...
-          self.space.autoCollide() # Setup the contact joints
-          self.world.quickStep(self.step)
-          self.timeRem -= self.step
-          self.contactGroup.empty() # Clear the contact joints
-
-          # Call the post-collision functions...
-          for ident,func in self.postCollide.iteritems():
-            func()
-
-        # Update all objects registered with this class to have their positions updated...
-        for key, data in self.synch.items():
-          node, body = data
-          node.setPosQuat(render,body.getPosition(),Quat(body.getQuaternion()))
-
-      return task.cont
-
-    taskMgr.add(simulationTask,'Physics Sim',sort=100)
-
-    # Arrange callback for collisions - we have one callback function which then checks a database to see if either geom in question has a specific callback function, in which case its called...
+    # Arrange variables for collision callback, enable the callbacks...
     self.collCB = dict() # OdeGeom to func(entry,flag), where flag is False if its in 1, true if its in 2.
-
-    def onCollision(entry):
-      geom1 = entry.getGeom1()
-      geom2 = entry.getGeom2()
-
-      for geom,func in self.collCB.iteritems(): # bad way of doing this - needs to be hashed, but doesn't seem to be possible currently.
-        if geom1==geom:
-          func(entry,False)
-        if geom2==geom:
-          func(entry,True)
-
     self.space.setCollisionEvent("collision")
-    self.accept("collision",onCollision)
+
+
+  def reload(self,manager,xml):
+    pass # No-op: This makes this module incorrect, but only because you can't change the configuration during runtime without unloading it first. Physics setup tends to remain constant however.
+
+
+  def simulationTask(self,task):
+    # Step the simulation and set the new positions - fixed time step...
+    self.timeRem += globalClock.getDt()
+    while self.timeRem>self.step:
+      # Call the pre-collision functions...
+      for ident,func in self.preCollide.iteritems():
+        func()
+
+      # Apply damping to all objects in damping db...
+      for key,data in self.damping.iteritems():
+        if data[0].isEnabled():
+          vel = data[0].getLinearVel()
+          vel *= -data[1]
+          data[0].addForce(vel)
+          rot = data[0].getAngularVel()
+          rot *= -data[2]
+          data[0].addTorque(rot)
+
+      # A single step of collision detection...
+      self.space.autoCollide() # Setup the contact joints
+      self.world.quickStep(self.step)
+      self.timeRem -= self.step
+      self.contactGroup.empty() # Clear the contact joints
+
+      # Call the post-collision functions...
+      for ident,func in self.postCollide.iteritems():
+        func()
+
+    # Update all objects registered with this class to have their positions updated...
+    for key, data in self.synch.items():
+      node, body = data
+      node.setPosQuat(render,body.getPosition(),Quat(body.getQuaternion()))
+
+    return task.cont
+
+
+  def onCollision(self,entry):
+    geom1 = entry.getGeom1()
+    geom2 = entry.getGeom2()
+
+    for geom,func in self.collCB.iteritems():
+      if geom==geom1:
+        func(entry,False)
+      if geom==geom2:
+        func(entry,True)
 
 
   def start(self):
-    self.runSim = True
+    self.task = taskMgr.add(self.simulationTask,'Physics Sim',sort=100)
+    self.accept("collision",self.onCollision)
 
   def stop(self):
-    self.runSim = False
+    taskMgr.remove(self.task)
+    del self.task
+
     self.timeRem = 0.0
+    self.ignoreAll()
 
 
   def getWorld(self):
