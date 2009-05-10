@@ -18,11 +18,15 @@
   </obj>
 
   <obj type="InitODE" name="ode">
+    <param erp="0.8"/>
+    
     <surface name="default" mu="0.5" bounce="0.7" absorb="1.0"/>
     <surface name="player" mu="0.0" bounce="0.0" absorb="100.0"/>
     <surface name="can_metal" mu="0.3" bounce="0.4" absorb="0.1"/>
     <surface name="sheet_metal" mu="10.0" bounce="0.4" absorb="40.0"/>
     <surface name="rock" mu="50.0" bounce="0.0" absorb="100.0"/>
+
+    <gravity z="-9.81"/>
   </obj>
 
   <obj type="ParticleManager" name="pm">
@@ -30,7 +34,11 @@
     <effect name="gun_spark" file="gun_spark.ptf" lifetime="0.1"/>
   </obj>
 
-  <obj type="Player" name="player"/>
+  <obj type="Player" name="player">
+    <size height="1.55" crouchHeight="0.7" radius ="0.3" headHeight="1.4" crouchHeadHeight="0.6"/>
+    <power baseImpulse="15000.0" feetImpulse="75000.0" crouchSpeed="4.0" jumpForce="16000.0" jumpLeeway="0.1"/>
+    <body mass="70.0" termVel="30.0"/>
+  </obj>
 
   <obj type="Camera" name="camera">
     <fov deg="70" zoom="40" zoomTime="0.1" near="0.05" far="12800.0"/>

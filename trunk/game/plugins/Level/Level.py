@@ -15,6 +15,7 @@
 
 
 import os.path
+import time
 from pandac.PandaModules import *
 import direct.directbase.DirectStart
 
@@ -22,44 +23,95 @@ import direct.directbase.DirectStart
 class Level:
   """This loads a level - that is it loads a collection fo egg files and sticks them at the origin. These files will typically be very large. 4 files, all optional, are typically given - the rendered file, the collision file, the detail file (Visible instances of high res geometry.) and the entity file. (Lots of empties used by the programmer.)"""
   def __init__(self,manager,xml):
+    self.reload(manager,xml)
+
+  def reload(self,manager,xml):
+    # Load from the xml the details needed to do the actual loading...
+    
     # Get the path to load levels from...
     basePath = manager.get('paths').getConfig().find('levels').get('path')
 
-    # Calculate the renderable path, load the egg...
+    # Get the details for the renderable geometry...
     rendElem = xml.find('render')
     if rendElem!=None:
-      rendPath = os.path.join(basePath,rendElem.get('filename'))
-      self.rend = loader.loadModel(rendPath)
+      self.rendPath = os.path.join(basePath,rendElem.get('filename'))
+      self.rendAmb = xml.find('ambient')!=None
+    else:
+      self.rendPath = None
+
+    # Get the details for the collision geometry...
+    colElem = xml.find('collide')
+    if colElem!=None:
+      self.colPath = os.path.join(basePath,colElem.get('filename'))
+      self.colSurface = colElem.get('surface','default')
+    else:
+      self.colPath = None
+
+    # Get the details for the instancing information - the things...
+    thingElem = xml.find('things')
+    if thingElem!=None:
+      self.thingPath = os.path.join(basePath,thingElem.get('filename'))
+    else:
+      self.thingPath = None
+
+    # We need access to the physiocs manager to do physics...
+    physics = xml.find('physics')
+    if physics!=None:
+      odeName = physics.get('plugin','ode')
+    else:
+      odeName = 'ode'
+    self.ode = manager.get(odeName)
+
+
+  def postInit(self):
+    for i in self.postReload():
+      yield i
+
+  def postReload(self):
+    # The renderable geometry...
+    self.rend = None
+    if self.rendPath!=None:
+      def rendCallback(model):
+        self.rend = model
+      loader.loadModel(self.rendPath, callback=rendCallback)
+      while self.rend==None:
+        time.sleep(0.05)
+        yield
       
-      if xml.find('ambient')!=None:
+      if self.rendAmb:
         self.ambLight = AmbientLight('Ambient Light')
         self.ambLight.setColor(VBase4(1.0,1.0,1.0,1.0))
         self.ambLightNode = self.rend.attachNewNode(self.ambLight)
         self.rend.setLight(self.ambLightNode)
-    else:
-      self.rend = None
+        yield
 
-    # Calculate the collision egg, load the egg, turn it into an ode mesh...
-    colElem = xml.find('collide')
-    if colElem!=None:
-      colPath = os.path.join(basePath,colElem.get('filename'))
-      self.colEgg = loader.loadModel(colPath)
+    # The collision geometry...
+    self.colEgg = None
+    if self.colPath!=None:
+      def colCallback(model):
+        self.colEgg = model
+      loader.loadModel(self.colPath, callback=colCallback)
+      while self.colEgg==None:
+        time.sleep(0.05)
+        yield
+
       self.colEgg.flattenStrong() # This is silly - removes all the advantage of octrees - need to write code to do this properlly by constructing the hierachy using ODE spaces. ###################################################################
-      
-      ode = manager.get('ode')
-      mesh = OdeTriMeshData(self.colEgg,True)
-      self.col = OdeTriMeshGeom(ode.getSpace(),mesh)
-      ode.getSpace().setSurfaceType(self.col,ode.getSurface('default'))
-    else:
-      self.colEgg = None
 
-    # Get the things mesh - this is usually a load of empties used to create objects...
-    thingElem = xml.find('things')
-    if thingElem!=None:
-      thingPath = os.path.join(basePath,thingElem.get('filename'))
-      self.things = loader.loadModel(thingPath)
-    else:
-      self.things = None
+      mesh = OdeTriMeshData(self.colEgg,True)
+      yield
+      self.col = OdeTriMeshGeom(self.ode.getSpace(),mesh)
+      yield
+      self.ode.getSpace().setSurfaceType(self.col,self.ode.getSurface(self.colSurface))
+
+    # The thing egg...
+    self.things = None
+    if self.thingPath!=None:
+      def thingCallback(model):
+        self.things = model
+      loader.loadModel(self.thingPath, callback=thingCallback)
+      while self.things==None:
+        time.sleep(0.05)
+        yield
 
 
   def start(self):
@@ -67,6 +119,7 @@ class Level:
 
   def stop(self):
     if self.rend: self.rend.detachNode()
+
 
   def getThings(self):
     return self.things
