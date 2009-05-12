@@ -16,8 +16,11 @@
 
 import os.path
 import time
+
 from pandac.PandaModules import *
 import direct.directbase.DirectStart
+
+import odeSpaceHier
 
 
 class Level:
@@ -54,7 +57,7 @@ class Level:
     else:
       self.thingPath = None
 
-    # We need access to the physiocs manager to do physics...
+    # We need access to the physics manager to do physics...
     physics = xml.find('physics')
     if physics!=None:
       odeName = physics.get('plugin','ode')
@@ -95,13 +98,16 @@ class Level:
         time.sleep(0.05)
         yield
 
-      self.colEgg.flattenStrong() # This is silly - removes all the advantage of octrees - need to write code to do this properlly by constructing the hierachy using ODE spaces. ###################################################################
+      surfaceType = self.ode.getSurface(self.colSurface)
+      for r in odeSpaceHier.eggToOde(self.colEgg,surfaceType):
+        yield
+        self.col = r
 
-      mesh = OdeTriMeshData(self.colEgg,True)
-      yield
-      self.col = OdeTriMeshGeom(self.ode.getSpace(),mesh)
-      yield
-      self.ode.getSpace().setSurfaceType(self.col,self.ode.getSurface(self.colSurface))
+      if (self.col==None):
+        print 'WARNING: Collision geometry contained nothing to collide against.'
+      else:
+        self.ode.getSpace().add(self.col)
+
 
     # The thing egg...
     self.things = None

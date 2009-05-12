@@ -2,7 +2,7 @@
   <obj type="Include" config="base"/>
   <obj type="Level" name="level">
     <render filename="test/geometry"/>
-    <collide filename="test/geometry"/> <!-- collision -->
+    <collide filename="test/collision"/>
     <things filename="test/things"/>
     <ambient/>
   </obj>
