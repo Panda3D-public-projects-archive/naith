@@ -2,6 +2,7 @@
   <obj type="Window" name="window">
     <antialias/>
   </obj>
+  <obj type="Loading" name="loading"/>
 
   <obj type="EscExit" name="esc_exit"/>
   <obj type="FrameRate" name="frame_rate"/>
@@ -51,6 +52,7 @@
     <camera plugin="camera"/>
     <muzzle_flash plugin="pm" effect="gun_flare" bone="Bone" pos="0.0,0.55,0.014"/>
     <sparks plugin="pm" effect="gun_spark"/>
+    <bullet rate="0.08" speed="920.0" mass="0.004"/>
   </obj>
 
   <obj type="MouseFPS" name="mouse">

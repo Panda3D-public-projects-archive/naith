@@ -1,4 +1,4 @@
-# Copyright Reinier de Blois
+# Copyright Tom SF Haines
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,17 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 from pandac.PandaModules import *
-from direct.directbase import DirectStart
 
-class Window:
-  """This plugin creates a window for rendering into."""
-  def __init__(self, manager, xml):
-    base.openDefaultWindow()
-    if base.win.getFbProperties().getMultisamples() > 0:
-      render.setAntialias(AntialiasAttrib.MAuto)
-    base.setBackgroundColor(0.0, 0.0, 0.0)
 
-  def screenshot(self):
-      base.screenshot()
+class Loading:
+  """Does a loading screen - renders some stuff whilst a transition is happenning."""
+  def __init__(self,manager,xml):
+    self.reload(manager,xml)
 
+  def reload(self,manager,xml):
+    self.node = loader.loadModel('data/weapons/assault/assault') ###########################
+    self.node.reparentTo(aspect2d)
+    self.node.setHpr(90.0,0.0,0.0)
+
+
+  def start(self):
+    self.node.hide()
+
+  def stop(self):
+    self.node.show()
