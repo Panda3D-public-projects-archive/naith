@@ -98,8 +98,16 @@ class Manager:
         if isinstance(start,types.MethodType):
           start()
 
+    def transFrameLimiter(task):
+      prevTime = globalClock.getRealTime()
+      for r in transTask(task):
+        currTime = globalClock.getRealTime()
+        if (currTime-prevTime)>(1.0/25.0):
+          yield task.cont
+          prevTime = currTime
+
     # Create a task to do the dirty work...
-    taskMgr.add(transTask,'Transition')
+    taskMgr.add(transFrameLimiter,'Transition')
 
 
   def end(self):
