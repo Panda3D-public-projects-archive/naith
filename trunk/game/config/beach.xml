@@ -39,7 +39,7 @@
 
   <obj type="Filters" config="filters">
     <hdr type="1"/>
-    <!--<perpixel/>-->
+    <perpixel/>
     <bloom size="medium"/>
     <showbuffers/>
   </obj>
