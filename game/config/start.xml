@@ -1,10 +1,15 @@
 <config>
   <obj type="Include" config="base"/>
+  
   <obj type="Level" name="level">
     <render filename="test/geometry"/>
     <collide filename="test/collision"/>
     <things filename="test/things"/>
     <ambient/>
+  </obj>
+  <obj type="CullAABB" name="cull">
+    <level plugin="level"/>
+    <debug/>
   </obj>
   
   <obj type="DirLight" name="sun">
