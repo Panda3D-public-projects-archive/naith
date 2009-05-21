@@ -28,7 +28,9 @@ class Loading:
 
 
   def start(self):
+    render.show()
     self.node.hide()
 
   def stop(self):
+    render.hide()
     self.node.show()
