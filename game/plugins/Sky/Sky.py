@@ -62,7 +62,7 @@ class Sky:
       godrays = xml.find('godrays')
       sunmask = xml.find('sunmask')
       if godrays != None and sunmask != None:
-        self.vlbuffer = base.win.makeTextureBuffer('VolumetricLighting', base.win.getXSize()/2, base.win.getYSize()/2)
+        self.vlbuffer = base.win.makeTextureBuffer('VolumetricLighting', base.win.getXSize()/4, base.win.getYSize()/4)
         self.vlbuffer.setClearColor(Vec4(0, 0, 0, 1))
         cam = base.makeCamera(self.vlbuffer)
         cam.node().setLens(base.camLens)
