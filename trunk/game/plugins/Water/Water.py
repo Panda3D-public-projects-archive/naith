@@ -59,12 +59,13 @@ class Water:
     self.surface.setShaderInput('light', manager.get('sky').sun)
     self.surface.setShaderInput('camera', base.cam)
     self.surface.setTransparency(TransparencyAttrib.MDual, 10)
+    self.surface.setTwoSided(True)
 
-    self.surface.setShaderInput('waveInfo', Vec4(0.2, 0.5, 0.5,0.1))
+    self.surface.setShaderInput('waveInfo', Vec4(0.4, 0.4, 0.4, 0))
     self.surface.setShaderInput('param2', Vec4(-0.015,0.005, 0.05, 0.05))
     self.surface.setShaderInput('param3', Vec4(0.7, 0.3, 0, 0))
-    self.surface.setShaderInput('param4', Vec4(5.0, 0.328, 0.471, 0.0))
-    self.surface.setShaderInput('speed', Vec4(-0.5, 0.2, -0.7, -0.15))
+    self.surface.setShaderInput('param4', Vec4(2.0, 0.5, 0.5, 0.0))
+    self.surface.setShaderInput('speed', Vec4(-.8, -.4, -.9, .3))
     self.surface.setShaderInput('deepcolor', Vec4(0.0,0.3,0.5,1.0))
     self.surface.setShaderInput('shallowcolor', Vec4(0.0,1.0,1.0,1.0))
     self.surface.setShaderInput('reflectioncolor', Vec4(0.95,1.0,1.0,1.0))
@@ -77,8 +78,9 @@ class Water:
     self.sky.setTwoSided(True)
     self.sky.setSz(self.sky, -1)
     self.sky.setClipPlaneOff(1)
-    self.sky.show(BitMask32.bit(1))
-    self.sky.hide(BitMask32.bit(0))
+    self.sky.hide(BitMask32.bit(0)) # Hide for normal camera
+    self.sky.show(BitMask32.bit(1)) # Show for reflection camera
+    self.sky.hide(BitMask32.bit(2)) # Hide for volumetric lighting camera
     self.wcamera.reparentTo(render)
     self.wcamera.node().setLens(base.camLens)
     self.wcamera.node().setCameraMask(BitMask32.bit(1))
