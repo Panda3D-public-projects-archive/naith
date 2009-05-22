@@ -85,15 +85,16 @@ void fshader(
 
   // Reflection
   float4 reflection;
-  //reflection.rgb = tex2Dproj(k_reflection, l_texcoord0).rgb;
   float4 distortion = normalize( tex2D( k_normal, N.xy ) - 0.5f ) * 2.0;
   reflection = tex2Dproj( k_reflection, l_texcoord0 + distortion);
 
   // Cheap HDR effect
   reflection.rgb *= (reflection.r + reflection.g + reflection.b) * k_param4.z;
   reflection.rgb *= facing;
-  float fresnel = saturate(k_param4.y + pow(facing, k_param4.x));
+  float fresnel = saturate(k_param4.y + pow(facing, k_param4.x)) * 0.6;
   o_color = lerp(k_shallowcolor, k_deepcolor, facing) * k_param3.y;
   o_color += lerp(o_color,  reflection * k_reflectioncolor, fresnel) * k_param3.x;
+  //o_color.rgb = fresnel;
   o_color.a = 1.0;
 }
+
