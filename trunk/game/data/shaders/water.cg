@@ -16,12 +16,10 @@ void vshader(in float4 vtx_position : POSITION,
              out float3x3 l_rotmatrix,
              out float4 l_position : POSITION)
 {
-  float ddx = 0.0, ddy = 0.0;
-  float deriv;
-  float angle;
-
   float2 position = mul(trans_model_to_world, vtx_position).xy;
 
+  float ddx = 0.0, ddy = 0.0, deriv, angle;
+  
   angle = dot(k_speed.xy, position) * k_waveInfo.x + k_time.x * 0.5;
   vtx_position.z += k_waveInfo.y * sin(angle);
   deriv = k_waveInfo.x * k_waveInfo.y * cos(angle);
@@ -91,10 +89,9 @@ void fshader(
   // Cheap HDR effect
   reflection.rgb *= (reflection.r + reflection.g + reflection.b) * k_param4.z;
   reflection.rgb *= facing;
-  float fresnel = saturate(k_param4.y + pow(facing, k_param4.x)) * 0.6;
+  float fresnel = saturate(k_param4.y + pow(facing, k_param4.x)) * 0.7;
   o_color = lerp(k_shallowcolor, k_deepcolor, facing) * k_param3.y;
   o_color += lerp(o_color,  reflection * k_reflectioncolor, fresnel) * k_param3.x;
-  //o_color.rgb = fresnel;
   o_color.a = 1.0;
 }
 

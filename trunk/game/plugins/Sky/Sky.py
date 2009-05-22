@@ -47,7 +47,6 @@ class Sky:
       self.model = loader.loadModel(os.path.join(basePath, 'skydome'))
       self.model.setLightOff(1)
       self.model.setShaderOff(1)
-      self.model.setFogOff(1)
       self.model.setCompass()
       self.model.setBin('background', 10)
       self.model.setDepthWrite(False)
@@ -56,8 +55,7 @@ class Sky:
       self.model.setTexture(loader.loadTexture(os.path.join(basePath, skydome.get('filename'))))
       self.model.setTag('sun', 'True')
       self.model.reparentTo(base.cam)
-      # Hide from the reflection camera
-      self.model.hide(BitMask32.bit(1))
+      self.model.hide(BitMask32.bit(1)) # Hide from the reflection camera
 
       godrays = xml.find('godrays')
       sunmask = xml.find('sunmask')
@@ -85,7 +83,7 @@ class Sky:
         card = CardMaker('VolumetricLightingCard')
         card.setFrameFullscreenQuad()
         self.finalQuad = render2d.attachNewNode(card.generate())
-        self.finalQuad.setAttrib(ColorBlendAttrib.make(ColorBlendAttrib.MAdd))
+        self.finalQuad.setAttrib(ColorBlendAttrib.make(ColorBlendAttrib.MAdd, ColorBlendAttrib.OIncomingColor, ColorBlendAttrib.OFbufferColor))
         self.finalQuad.setShader(Shader.load(os.path.join(manager.get('paths').getConfig().find('shaders').get('path'), 'filter-vlight.cg')))
         self.finalQuad.setShaderInput('src', self.vltexture)
         self.finalQuad.setShaderInput('vlparams', 32, 0.9/32.0, 0.97, 0.5)

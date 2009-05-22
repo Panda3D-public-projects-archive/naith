@@ -16,7 +16,7 @@ __all__ = ["Water"]
 import os
 from pandac.PandaModules import HeightfieldTesselator, PNMImage, Filename
 from pandac.PandaModules import BitMask32, TransparencyAttrib, Texture
-from pandac.PandaModules import RenderState, CullFaceAttrib
+from pandac.PandaModules import RenderState, CullFaceAttrib, Fog
 from pandac.PandaModules import Plane, PlaneNode, Vec4, Vec3, Point3, NodePath
 
 POLYCOUNT = 50000
@@ -56,7 +56,6 @@ class Water:
     ntex = loader.loadTexture('data/textures/water-normal.png')
     ntex.setMinfilter(Texture.FTLinearMipmapLinear)
     self.surface.setShaderInput('normal', ntex)
-    self.surface.setShaderInput('light', manager.get('sky').sun)
     self.surface.setShaderInput('camera', base.cam)
     self.surface.setTransparency(TransparencyAttrib.MDual, 10)
     self.surface.setTwoSided(True)
@@ -70,23 +69,26 @@ class Water:
     self.surface.setShaderInput('shallowcolor', Vec4(0.0,1.0,1.0,1.0))
     self.surface.setShaderInput('reflectioncolor', Vec4(0.95,1.0,1.0,1.0))
 
-    wbuffer = base.win.makeTextureBuffer('water', 512, 512)
-    wbuffer.setClearColorActive(True)
-    wbuffer.setClearColor(base.win.getClearColor())
-    self.wcamera = base.makeCamera(wbuffer)
-    self.sky = manager.get('sky').model.copyTo(self.wcamera)
-    self.sky.setTwoSided(True)
-    self.sky.setSz(self.sky, -1)
-    self.sky.setClipPlaneOff(1)
-    self.sky.hide(BitMask32.bit(0)) # Hide for normal camera
-    self.sky.show(BitMask32.bit(1)) # Show for reflection camera
-    self.sky.hide(BitMask32.bit(2)) # Hide for volumetric lighting camera
+    self.wbuffer = base.win.makeTextureBuffer('water', 512, 512)
+    self.wbuffer.setClearColorActive(True)
+    self.wbuffer.setClearColor(base.win.getClearColor())
+    self.wcamera = base.makeCamera(self.wbuffer)
+    if manager.get('sky') != None and manager.get('sky').model != None:
+      self.sky = manager.get('sky').model.copyTo(self.wcamera)
+      self.sky.setTwoSided(True)
+      self.sky.setSz(self.sky, -1)
+      self.sky.setClipPlaneOff(1)
+      self.sky.hide(BitMask32.bit(0)) # Hide for normal camera
+      self.sky.show(BitMask32.bit(1)) # Show for reflection camera
+      self.sky.hide(BitMask32.bit(2)) # Hide for volumetric lighting camera
+    else:
+      self.sky = None
     self.wcamera.reparentTo(render)
     self.wcamera.node().setLens(base.camLens)
     self.wcamera.node().setCameraMask(BitMask32.bit(1))
     self.wcamera.node().setInitialState(RenderState.make(CullFaceAttrib.makeReverse()))
     self.surface.hide(BitMask32.bit(1))
-    wtexture = wbuffer.getTexture()
+    wtexture = self.wbuffer.getTexture()
     wtexture.setWrapU(Texture.WMClamp)
     wtexture.setWrapV(Texture.WMClamp)
     wtexture.setMinfilter(Texture.FTLinearMipmapLinear)
@@ -97,12 +99,20 @@ class Water:
     tmpnp.setClipPlane(self.wplanenp)
     self.wcamera.node().setInitialState(tmpnp.getState())
 
+    #self.fog = Fog('UnderwaterFog')
+    #self.fog.setColor(0.0,0.3,0.5)
+    self.fogEnabled = False
+
     self.updateTask = taskMgr.add(self.update, 'water-update')
 
   def stop(self):
     taskMgr.remove(self.updateTask)
 
   def update(self, task):
+    if base.cam.getX(render) < 0.0 and not self.fogEnabled:
+      self.fogEnabled = True
+    elif base.cam.getX(render) > 0.0 and self.fogEnabled:
+      self.fogEnabled = False
     self.surface.setX(render, base.cam.getX(render))
     self.surface.setY(render, base.cam.getY(render))
     self.wcamera.setMat(base.cam.getMat(render) * self.wplane.getReflectionMat())
