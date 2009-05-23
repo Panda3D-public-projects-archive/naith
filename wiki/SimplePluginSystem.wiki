@@ -12,6 +12,14 @@ Type indicates which plugin to use, name the name used by other plugins to get t
 
 A plugin class has an __init__(self,manager,xml) constructor. The manager gives the plugin manager object, the xml gives the obj element that declares the instance, as a xml.etree Element from the python standard library.
 
+A plugin class should also have a static method called depends - it is given the configuration xml and required to return a list of strings of plugin names it depends on, i.e
+{{{
+@staticmethod
+def depends(xml):
+  ...
+}}}
+When choosing between multiple plugins whos dependencies have been satisfied it will choose the first in the file. (And includes will handle this correctly.) Right now this feature is not used, but ultimately specifying the plugins in linear order is annoying, so plugins should start implementing this now so they are ready for when this is implemented. If this method is not defined it is assumed the plugin has no dependencies.
+
 A plugin can optionally declare a reload(self,manager,xml) method - on transition from one config file to another if the new config file contains a variable with the same type that has this method it will be called instead of deleting the old one and replacing it.
 
 A plugin can optionally have a postInit generator and a postReload generator - in both cases called immediately after the __init__ or Reload methods. These should be used if a lot of work is happening to avoid blocking the frame rate.
@@ -19,8 +27,9 @@ A plugin can optionally have a postInit generator and a postReload generator - i
 
 A plugin can also have the start(self) method - this will be called in creation order on all plugins at the end of a transition.
 A plugin can also have the stop(self) method - this will be called in reverse creation order on all plugins at the start of a transition.
+Note that a plugin should only render to screen or play sound when it has been started but not stopped - otherwise it will interfere with the loading screens. (unless it is a loading screen, in which case it will do the reverse.)
 
-Finally, there can be a 'destroy' method which is called after a stop when rhe plugin is defiantly not going to be reused.
+Finally, there can be a 'destroy' method which is called after a stop when the plugin is defiantly not going to be reused.
 
 
 Transitions are what make this system worthwhile - at any point you can transition to a new config file - so one config file could be the menu, then another for each level, etc. When transitioning a loading screen will automatically be displayed.
