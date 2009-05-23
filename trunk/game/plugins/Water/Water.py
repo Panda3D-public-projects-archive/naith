@@ -20,7 +20,7 @@ from pandac.PandaModules import RenderState, CullFaceAttrib, Fog
 from pandac.PandaModules import Plane, PlaneNode, Vec4, Vec3, Point3, NodePath
 
 POLYCOUNT = 50000
-SIZE = (256, 256)
+SIZE = (512, 512)
 CACHEDFILE = "cache/plane-%dx%d-%dk.bam" % (SIZE[0], SIZE[1], int(POLYCOUNT / 1000))
 
 def generateWaterSurface():
