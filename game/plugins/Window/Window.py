@@ -19,8 +19,7 @@ class Window:
   """This plugin creates a window for rendering into."""
   def __init__(self, manager, xml):
     base.openDefaultWindow()
-    if base.win.getFbProperties().getMultisamples() > 0:
-      render.setAntialias(AntialiasAttrib.MAuto)
+    render.setAntialias(AntialiasAttrib.MAuto)
     base.setBackgroundColor(0.0, 0.0, 0.0)
 
   def screenshot(self):
