@@ -15,6 +15,8 @@
 
 from pandac.PandaModules import *
 
+from AABB import *
+
 
 class CullAABB:
   def __init__(self,manager,xml):
@@ -32,11 +34,7 @@ class CullAABB:
     # Load the AABB's into a list of bounds...
     bounds = []
     for node in level.getByIsA('CullAABB'):
-      minP = Point3()
-      maxP = Point3()
-      node.calcTightBounds(minP,maxP)
-      bounds.append(((minP[0],maxP[0]),(minP[1],maxP[1]),(minP[2],maxP[2])))
-
-    # If debug print them out...
-    if xml.find('debug')!=None:
-      print 'bounds = ',bounds
+      low = Point3()
+      high = Point3()
+      node.calcTightBounds(low,high)
+      bounds.append(AABB(low,high))
