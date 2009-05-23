@@ -146,7 +146,9 @@ class Manager:
       print 'Loading plugin', plugin
       fp, path, desc = imp.find_module(plugin,[self.pluginDir+plugin+'/'])
       try:
+        sys.path.append(self.pluginDir+plugin+'/')
         self.plugin[plugin] = imp.load_module(plugin,fp,path,desc)
+        del sys.path[-1]
       finally:
         if fp:
           fp.close()
