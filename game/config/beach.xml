@@ -5,8 +5,8 @@
     <collide filename="beach/beach"/>
   </obj>
 
-  <obj type="PhysicsObject" name="floor">
-    <physics type="plane" surface="default" a="0" b="0" c="1" d="0"/>
+  <obj type="StaticObject" name="floor">
+    <physics type="plane" surface="default"/>
     <instance z="-1"/>
   </obj>
 
