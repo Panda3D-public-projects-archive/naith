@@ -131,7 +131,7 @@ class PhysicsObject:
 
         # Create the mass object for the physics...
         body = OdeBody(self.ode.getWorld())
-        if hasattr(body, setData):
+        if hasattr(body, 'setData'):
           body.setData(model)
         col.setBody(body)
         mass = OdeMass()
