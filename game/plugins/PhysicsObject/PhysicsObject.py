@@ -131,6 +131,7 @@ class PhysicsObject:
 
         # Create the mass object for the physics...
         body = OdeBody(self.ode.getWorld())
+        body.setData(model)
         col.setBody(body)
         mass = OdeMass()
         if pType=='sphere':
