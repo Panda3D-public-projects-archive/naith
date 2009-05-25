@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from pandac.PandaModules import CardMaker, Texture, ModelRoot, ColorBlendAttrib, DecalEffect, NodePath, Point2, Point3
+from random import random
 
 BULLETHOLE_SIZE = 0.05
 
@@ -34,7 +35,7 @@ class BulletHoles:
     newhole.setPos(pos)
     # Offset it a little to avoid z-fighting
     # Increase this value if you still see it.
-    newhole.setY(newhole, -.005)
+    newhole.setY(newhole, -.001 - random() * 0.01)
     # We don't want one batch per bullet hole, so flatten it.
     # This could be made smarter to preserve culling, but
     # I have yet to see a performance loss.
