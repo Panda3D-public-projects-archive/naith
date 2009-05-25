@@ -102,6 +102,12 @@ class SimpleWeapon:
     self.firing = False # True if the trigger is being held.
     self.triggerTime = 0.0 # How long the trigger has been held for, so we know when to eject ammo.
 
+    # For bullet holes
+    bh = xml.find('bullet_holes')
+    if bh != None:
+      self.bulletHoles = manager.get(bh.get('plugin'))
+    else:
+      self.bulletHoles = None
 
   def postInit(self):
     for i in self.postReload():
@@ -145,8 +151,8 @@ class SimpleWeapon:
         # Create a muzzle flash effect...
         self.flashManager.doEffect(self.flashEffect, self.flashBone, True, self.flashPos)
 
-        # Create an impact sparks effect...
-        if hit!=None:
+        if hit != None:
+          # Create an impact sparks effect...
           # Calculate the reflection direction...
           rd = self.ray.getDirection()
           sparkDir = (norm * (2.0*norm.dot(rd))) - rd
@@ -164,6 +170,9 @@ class SimpleWeapon:
 
           # Set it going...
           self.sparksManager.doEffect(self.sparksEffect, render, False, pos, sparkQuat)
+
+          # Make a bullet hole
+          self.bulletHoles.makeNew(pos, norm)
 
         # Impart some energy on the object...
         if hit!=None and hit.hasBody():

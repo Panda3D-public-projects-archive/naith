@@ -35,8 +35,10 @@
     <effect name="gun_spark" file="gun_spark.ptf" lifetime="0.1"/>
   </obj>
 
+  <obj type="BulletHoles" name="bh" />
+
   <obj type="Player" name="player">
-    <size height="1.55" crouchHeight="0.7" radius ="0.3" headHeight="1.4" crouchHeadHeight="0.6"/>
+    <size height="1.55" crouchHeight="0.7" radius="0.3" headHeight="1.4" crouchHeadHeight="0.6"/>
     <power baseImpulse="15000.0" feetImpulse="75000.0" crouchSpeed="4.0" jumpForce="16000.0" jumpLeeway="0.1"/>
     <body mass="70.0" termVel="30.0"/>
   </obj>
@@ -53,6 +55,7 @@
     <muzzle_flash plugin="pm" effect="gun_flare" bone="Bone" pos="0.0,0.55,0.014"/>
     <sparks plugin="pm" effect="gun_spark"/>
     <bullet rate="0.08" speed="920.0" mass="0.004"/>
+    <bullet_holes plugin="bh" /> 
   </obj>
 
   <obj type="MouseFPS" name="mouse">
