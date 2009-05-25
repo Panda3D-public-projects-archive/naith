@@ -151,7 +151,7 @@ class SimpleWeapon:
         # Create a muzzle flash effect...
         self.flashManager.doEffect(self.flashEffect, self.flashBone, True, self.flashPos)
 
-        if hit != None:
+        if hit:
           # Create an impact sparks effect...
           # Calculate the reflection direction...
           rd = self.ray.getDirection()
@@ -172,10 +172,13 @@ class SimpleWeapon:
           self.sparksManager.doEffect(self.sparksEffect, render, False, pos, sparkQuat)
 
           # Make a bullet hole
-          self.bulletHoles.makeNew(pos, norm)
+          if hit.hasBody() and isinstance(hit.getBody().getData(), NodePath):
+            self.bulletHoles.makeNew(pos, norm, hit.getBody().getData())
+          else:
+            self.bulletHoles.makeNew(pos, norm, None)
 
         # Impart some energy on the object...
-        if hit!=None and hit.hasBody():
+        if hit and hit.hasBody():
           body = hit.getBody()
 
           # Calculate the force required to supply the energy the bullet contains to the body...

@@ -28,21 +28,32 @@ class BulletHoles:
     self.card.setFrame(-s, s, -s, s)
     self.card.setUvRange(Point2(0, 0), Point2(1, 1))
 
-  def makeNew(self, pos, nor):
+  def makeNew(self, pos, nor, parent = None):
+    """Makes a new bullet hole."""
+    if parent == None:
+      parent = self.container
+    else:
+      # Add a subnode to the parent, if it's not already there
+      child = parent.find('bullet-holes')
+      if child.isEmpty():
+        parent = parent.attachNewNode('bullet-holes')
+      else:
+        parent = child
     newhole = NodePath(self.card.generate())
-    newhole.reparentTo(self.container)
-    newhole.lookAt(-Point3(nor))
-    newhole.setPos(pos)
+    newhole.reparentTo(parent)
+    newhole.lookAt(render, Point3(newhole.getPos(render) - nor))
+    newhole.setPos(render, pos)
     # Offset it a little to avoid z-fighting
     # Increase this value if you still see it.
     newhole.setY(newhole, -.001 - random() * 0.01)
+    del newhole
     # We don't want one batch per bullet hole, so flatten it.
     # This could be made smarter to preserve culling, but
     # I have yet to see a performance loss.
-    self.container.flattenStrong()
-    self.container.setTexture(self.texture)
-    self.container.setTransparency(True)
-    self.container.setShaderOff(1)
+    parent.flattenStrong()
+    parent.setTexture(self.texture)
+    parent.setTransparency(True)
+    parent.setShaderOff(1)
 
   def destroy(self):
     self.container.removeNode()
