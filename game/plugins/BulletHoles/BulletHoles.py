@@ -42,6 +42,7 @@ class BulletHoles:
     newhole = NodePath(self.card.generate())
     newhole.reparentTo(parent)
     newhole.lookAt(render, Point3(newhole.getPos(render) - nor))
+    newhole.setR(newhole, random() * 360.0)
     newhole.setPos(render, pos)
     # Offset it a little to avoid z-fighting
     # Increase this value if you still see it.
