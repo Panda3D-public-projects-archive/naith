@@ -50,6 +50,8 @@ class BulletHoles:
     # We don't want one batch per bullet hole, so flatten it.
     # This could be made smarter to preserve culling, but
     # I have yet to see a performance loss.
+    # The clearTexture() is a necessary hack.
+    parent.clearTexture()
     parent.flattenStrong()
     parent.setTexture(self.texture)
     parent.setTransparency(True)
