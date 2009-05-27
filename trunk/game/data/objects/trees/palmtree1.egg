@@ -56,6 +56,7 @@
   <Scalar> minfilter { LINEAR_MIPMAP_LINEAR }
   <Scalar> magfilter { LINEAR_MIPMAP_LINEAR }
   <Scalar> wrap { CLAMP }
+  <Scalar> alpha { BINARY }
 }
 <Group> Cylinder {
   <Transform> {
