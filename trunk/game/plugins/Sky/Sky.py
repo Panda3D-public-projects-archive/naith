@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import os
-from pandac.PandaModules import Point2, Vec3, Vec4, NodePath, CardMaker, Shader, ColorBlendAttrib, Texture, BitMask32
+from pandac.PandaModules import Point2, Vec3, Vec4, NodePath, CardMaker, Shader, ColorBlendAttrib, Texture, BitMask32, TransparencyAttrib
 
 class Sky:
   """This loads a skydome/box/whatever the user specified."""
@@ -70,6 +70,7 @@ class Sky:
         initstatenode.setShaderOff(10000)
         initstatenode.setLightOff(10000)
         initstatenode.setMaterialOff(10000)
+        initstatenode.setTransparency(TransparencyAttrib.MBinary, 10000)
         tagstatenode = NodePath('SunOverrideState')
         tagstatenode.setColorScale(1, 1, 1, 1, 10001)
         tagstatenode.setTexture(loader.loadTexture(os.path.join(basePath, sunmask.get('filename'))))
