@@ -21,7 +21,7 @@ class Window:
     base.openDefaultWindow()
     render.setAntialias(AntialiasAttrib.MAuto)
     base.setBackgroundColor(0.0, 0.0, 0.0)
-
-  def screenshot(self):
-      base.screenshot()
+  
+  screenshot      = lambda self: base.screenshot()
+  toggleWireframe = lambda self: base.toggleWireframe()
 
