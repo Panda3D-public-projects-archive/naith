@@ -3,6 +3,12 @@
   <obj type="Level" name="level">
     <render filename="beach/beach"/>
     <collide filename="beach/beach"/>
+    <things filename="beach/beach-things"/>
+  </obj>
+
+  <obj type="StaticObject" name="tree">
+    <isa source="level" name="Tree"/>
+    <mesh filename="trees/palmtree1"/>
   </obj>
 
   <obj type="StaticObject" name="floor">
