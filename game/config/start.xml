@@ -7,9 +7,11 @@
     <things filename="test/things"/>
     <ambient/>
   </obj>
+  <obj type="MethodOnKey" name="levelVisible">
+    <action key="f8" plugin="level" method="toggleVisible"/>
+  </obj>
   <obj type="CullAABB" name="cull">
     <level plugin="level"/>
-    <debug/>
   </obj>
   
   <obj type="DirLight" name="sun">

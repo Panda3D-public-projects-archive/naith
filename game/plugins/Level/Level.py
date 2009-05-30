@@ -139,3 +139,9 @@ class Level:
       ret.append(col[i])
     return ret
 
+  def toggleVisible(self):
+    if self.rend.isHidden():
+      self.rend.show()
+    else:
+      self.rend.hide()
+

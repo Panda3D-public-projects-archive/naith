@@ -66,6 +66,13 @@ class StaticObject:
     else:
       pType = None
 
+    cullElem = self.xml.find('cull')
+    if cullElem!=None:
+      cullName = cullElem.get('plugin','cull')
+      cull = self.manager.get(cullName)
+    else:
+      cull = None
+
     # Find all instances of the object to create...
     toMake = []
     for isa in self.xml.findall('isa'):
@@ -129,7 +136,9 @@ class StaticObject:
         self.ode.getSpace().setSurfaceType(col,self.ode.getSurface(surface))
 
       if self.xml.find('mesh')!=None:
-        model.setPosQuat(make.getPos(render),make.getQuat(render))
+        model.setPosQuat(render,make.getPos(render),make.getQuat(render))
+        if cull:
+          cull.cullStatic(model)
       self.things.append((model,col))
 
       yield

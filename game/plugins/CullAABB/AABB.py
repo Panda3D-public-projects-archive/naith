@@ -15,6 +15,7 @@
 
 import math
 
+from pandac.PandaModules import *
 
 
 class AABB:
@@ -30,7 +31,7 @@ class AABB:
 
   def within(self,node):
     """Given a NodePath returns True if its in the AABB, False if it isn't."""
-    pos = node.getPos()
+    pos = node.getPos(render)
     return pos[0]>=self.x[0] and pos[0]<=self.x[1] and pos[1]>=self.y[0] and pos[1]<=self.y[1] and pos[2]>=self.z[0] and pos[2]<=self.z[1]
 
   def __str__(self):
@@ -101,18 +102,23 @@ class SetAABB:
     # We have our bests - we now make this actual object, and then recurse to make the full tree...
     zeroCount = 0
     if len(bestLow)==0: zeroCount += 1
-    if len(bestMid)==0: zeroCount += 1
     if len(bestHigh)==0: zeroCount += 1
     
-    if zeroCount==2:
+    if zeroCount!=2:
       self.leaf = True
       self.data = bestLow + bestMid + bestHigh
     else:
       self.leaf = False
       self.splitDim = bestDimension
       self.split = bestCutPoint
+
       self.low = SetAABB(bestLow)
-      self.mid = SetAABB(bestMid)
+
+      if len(bestMid)!=0:
+        self.mid = SetAABB(bestMid)
+      else:
+        self.mid = None
+
       self.high = SetAABB(bestHigh)
 
 
@@ -124,15 +130,17 @@ class SetAABB:
           return aabb
       return None
     else:
-      res = self.mid.within(node)
-      if res!=None: return res
+      if self.mid:
+        res = self.mid.within(node)
+        if res!=None: return res
       
-      if node.getPos()[self.splitDim]<self.split:
+      if node.getPos(render)[self.splitDim]<self.split:
         res = self.low.within(node)
         if res!=None: return res
       else:
         res = self.high.within(node)
         if res!=None: return res
+      return None
 
 
 
@@ -147,17 +155,15 @@ class Portal:
     """Setup the portal from a face of the given aabb - you specify the dim of the face, with side==False meaning the low side and side==True meaning the high side. Will be anti-clockwise looking at it from inside the cube."""
     if side:
       side = 1
-      inc = 1
     else:
       side = 0
-      inc = 2
 
     # Define square2d, remap it to 3D coordinates based on dim and side...
     square2d = [(0,0),(0,1),(1,1),(1,0)]
     def incDim(base):
       ret = [0,0,0]
-      ret[(dim+inc)%3] = base[0]
-      ret[(dim+2*inc)%3] = base[1]
+      ret[(dim+1)%3] = base[0]
+      ret[(dim+2)%3] = base[1]
       ret[dim] = side
       return ret
     square3d = map(incDim,square2d)
@@ -168,6 +174,26 @@ class Portal:
       coord = map(lambda d: aabb.bounds[d][index[d]],xrange(3))
       self.verts.append(coord)
 
+    # If needed reorder them so its anticlockwise ordering from the view of the centre of the aabb...
+    offsetC = map(lambda x: map(lambda a,b: a-b,x,aabb.centre),self.verts)
+    ind = sum(map(lambda i:offsetC[1][i]*(offsetC[0][(i+1)%3]*offsetC[2][(i+2)%3] - offsetC[0][(i+2)%3]*offsetC[2][(i+1)%3]),xrange(3)))
+    if ind<0.0:
+      self.verts = [self.verts[0],self.verts[3],self.verts[2],self.verts[1]]
+
+  def setupPortal(self,portal,portalNode,flip):
+    if flip:
+      order = [0,3,2,2]
+    else:
+      order = [0,1,2,3]
+
+    c = map(lambda i:sum(map(lambda x:x[i],self.verts))/4.0,xrange(3))
+
+    portalNode.setPos(render,Vec3(c[0],c[1],c[2]))
+
+    portal.clearVertices()
+    for o in order:
+      portal.addVertex(Point3(self.verts[o][0] - c[0],self.verts[o][1] - c[1],self.verts[o][2] - c[2]))
+
 
 
 def findPortals(aabbs,overlap = 1e-3):
@@ -177,6 +203,7 @@ def findPortals(aabbs,overlap = 1e-3):
     aabb.portals = [[[],[]],[[],[]],[[],[]]]
   
   # We process each dimension seperatly - this first loop is over the dimensions...
+  ret = []
   for dim in xrange(3):
     otherDim = [0,1,2]
     del otherDim[dim]
@@ -191,7 +218,6 @@ def findPortals(aabbs,overlap = 1e-3):
     events.sort(key=lambda x: x[1])
 
     # Iterate through the events in sequence - each time a aabb is pushed or popped check if it intercepts a face larger than it - if so add the relevant portal... (Partial interception is considered an error as it results in ambiguous behaviour. Multiple interception is also not allowed as its an entire face that intercepts from our point of view. (Larger face can have multiple intercepts of course.))
-    ret = []
     state = dict() # Index by id of aabb's
     for event in events:
       if not event[0]:
@@ -201,14 +227,19 @@ def findPortals(aabbs,overlap = 1e-3):
       # Check event aabb against existing aabbs for being the smaller face...
       done = False
       for key,aabb in state.iteritems():
-        withinCount = 0
+        # Verify that the sorting dimension is not contained, i.e. they overlap so a portal can be created...
+        if (event[2].bounds[dim][0]>aabb.bounds[dim][0]) == (event[2].bounds[dim][1]<aabb.bounds[dim][1]):
+          continue
+
+        # Check if bounds overlap, done such that we can detect corner overlaps...
+        withinCount = [0,0,0]
         for od in otherDim:
           if event[2].bounds[od][0]>aabb.bounds[od][0] and event[2].bounds[od][0]<aabb.bounds[od][1]:
-            withinCount += 1
+            withinCount[od] += 1
           if event[2].bounds[od][1]>aabb.bounds[od][0] and event[2].bounds[od][1]<aabb.bounds[od][1]:
-            withinCount += 1
+            withinCount[od] += 1
 
-        if withinCount==4:
+        if sum(withinCount)==4:
           if done:
             raise Exception('Double interception - each culling aabb face can only intrecept one other cube as a fully contained face')
           done = True
@@ -230,11 +261,14 @@ def findPortals(aabbs,overlap = 1e-3):
           event[2].portals[dim][evSide].append(portal)
           aabb.portals[dim][(evSide+1)%2].append(portal)
 
-        elif withinCount!=0:
-          raise Exception('Partial interception - culling aabbs can not intecept at corners/edges due to undefinable behaviour - must only overlap with one face fully contained within another.')
+        elif len(filter(lambda x:x>0,withinCount))==2:
+          exp = 'Partial interception - culling aabbs can not intecept at corners/edges due to undefinable behaviour - must only overlap with one face fully contained within another.'
+          exp += ' dimension = ' + str(dim) + '; within = ' + str(withinCount) + '; '
+          exp += str(event[2]) + ' against ' + str(aabb)
+          raise Exception(exp)
 
       if event[0]:
         # Push event - add the events aabb to the state...
         state[id(event[2])] = event[2]
 
-    return ret
+  return ret
