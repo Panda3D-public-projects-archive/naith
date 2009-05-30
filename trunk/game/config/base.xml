@@ -73,7 +73,7 @@
     <weapon plugin="weapon"/>
   </obj>
 
-  <obj type="MethodOnKey" name="playerReset">
+  <obj type="MethodOnKey" name="assortedKeys">
     <action key="f7" plugin="window" method="toggleWireframe"/>
     <action key="f9" plugin="player" method="reset"/>
     <action key="f11" plugin="window" method="screenshot"/>
