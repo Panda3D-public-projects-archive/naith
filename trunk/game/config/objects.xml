@@ -3,6 +3,7 @@
     <isa source="level" name="Pedestal"/>
     <mesh filename="pedestal/pedestal"/>
     <physics type="mesh" surface="sheet_metal" filename="pedestal/pedestal"/>
+    <cull plugin="cull"/>
   </obj>
   
   <obj type="PhysicsObject" name="spam">
