@@ -24,15 +24,18 @@ class MethodOnKey(DirectObject.DirectObject):
     self.reload(manager,xml)
 
   def reload(self,manager,xml):
-    action = xml.find('action')
-    self.doAction = getattr(manager.get(action.get('plugin')),action.get('method'))
-    self.key = action.get('key')
+    self.actions = []
+    for action in xml.findall('action'):
+      a = getattr(manager.get(action.get('plugin')),action.get('method'))
+      k = action.get('key')
+      self.actions.append((k,a))
 
-  def action(self):
-    self.doAction()
+  def action(self,i):
+    self.actions[i][1]()
 
   def start(self):
-    self.accept(self.key,self.action)
+    for i in xrange(len(self.actions)):
+      self.accept(self.actions[i][0],self.action,[i])
 
   def stop(self):
     self.ignoreAll()
