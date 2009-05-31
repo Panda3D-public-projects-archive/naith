@@ -16343,6 +16343,10 @@
   }
 }
 <Group> Plane {
+  <Scalar> blend { ADD }
+  <Scalar> blendop-a { incoming-alpha }
+  <Scalar> blendop-b { constant-alpha }
+  <Scalar> blenda { 0.3 }
   <Transform> {
     <Matrix4> {
       0.300000 0.000000 0.000000 0.000000

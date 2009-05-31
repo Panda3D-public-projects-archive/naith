@@ -34,12 +34,6 @@ class Profile(DirectObject.DirectObject):
         PStatClient.connect()
       taskMgr.doMethodLater(0.5,tryAgain,'pstats again')
 
-  def start(self):
-    self.accept('f10',self.go)
-
-  def stop(self):
-    self.ignore('f10')
-
   def reload(self,manager,xml):
     pass
 
