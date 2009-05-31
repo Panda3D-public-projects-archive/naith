@@ -58,7 +58,7 @@ class BulletHoles:
     parent.setTransparency(True)
     parent.setShaderOff(1)
     parent.hide(BitMask32.bit(2)) # Invisible to volumetric lighting camera (speedup)
-    paretn.hide(BitMask32.bit(3)) # Invisible to shadow cameras (speedup)
+    parent.hide(BitMask32.bit(3)) # Invisible to shadow cameras (speedup)
 
   def destroy(self):
     self.container.removeNode()
