@@ -26,7 +26,6 @@ class DirLight:
     self.lightNode.setCompass()
     if hasattr(self.lightNode.node(), "setCameraMask"):
       self.lightNode.node().setCameraMask(BitMask32.bit(3))
-    self.lightNode.node().showFrustum()
 
     self.reload(manager,xml)
 
