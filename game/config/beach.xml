@@ -27,9 +27,10 @@
   <obj type="Water" name="water">
   </obj>
 
-  <obj type="PointLight" name="sun">
+  <obj type="DirLight" name="sun">
     <color r="5.0" g="4.0" b="1.25"/>
-    <pos x="-50000" y="200" z="50000"/>
+    <lookAt x="50000" y="-200" z="-50000"/>
+    <lens near="-10" far="10" width="10" height="10"/>
   </obj>
 
   <obj type="Filters" config="filters">

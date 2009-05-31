@@ -13,14 +13,20 @@
 # limitations under the License.
 
 
-from pandac.PandaModules import VBase4
+from pandac.PandaModules import VBase4, BitMask32
 from pandac.PandaModules import DirectionalLight as PDirectionalLight
 
 class DirLight:
   """Creates a simple directional light"""
   def __init__(self,manager,xml):
     self.light = PDirectionalLight('dlight')
-    self.lightNode = render.attachNewNode(self.light)
+    # We want to reparent it to the camera with a compass effect.
+    # It doesn't make any difference, except with shadows enabled.
+    self.lightNode = base.camera.attachNewNode(self.light)
+    self.lightNode.setCompass()
+    if hasattr(self.lightNode.node(), "setCameraMask"):
+      self.lightNode.node().setCameraMask(BitMask32.bit(3))
+    self.lightNode.node().showFrustum()
 
     self.reload(manager,xml)
 
@@ -33,11 +39,26 @@ class DirLight:
     pos = xml.find('pos')
     if pos!=None:
       self.lightNode.setPos(float(pos.get('x')), float(pos.get('y')), float(pos.get('z')))
+    else:
+      self.lightNode.setPos(0, 0, 0)
 
     lookAt = xml.find('lookAt')
     if lookAt!=None:
       self.lightNode.lookAt(float(lookAt.get('x')), float(lookAt.get('y')), float(lookAt.get('z')))
 
+    lens = xml.find('lens')
+    if lens!=None and hasattr(self.lightNode.node(), 'getLens'):
+      lobj = self.lightNode.node().getLens()
+      lobj.setNearFar(float(lens.get('near', 1.0)), float(lens.get('far', 100000.0)))
+      lobj.setFilmSize(float(lens.get('width', 1.0)), float(lens.get('height', 1.0)))
+
+    if hasattr(self.lightNode.node(), 'setShadowCaster'):
+      shadows = xml.find('shadows')
+      if shadows!=None:
+        self.lightNode.node().setShadowCaster(True, int(shadows.get('width', 512)), int(shadows.get('height', 512)), int(shadows.get('sort', -10)))
+        self.lightNode.node().setPushBias(float(shadows.get('bias', 0.5)))
+      else:
+        self.lightNode.node().setShadowCaster(False)
 
   def start(self):
     render.setLight(self.lightNode)

@@ -56,6 +56,7 @@ class Sky:
       self.model.setTag('sun', 'True')
       self.model.reparentTo(base.cam)
       self.model.hide(BitMask32.bit(1)) # Hide from the reflection camera
+      self.model.hide(BitMask32.bit(3)) # Hide from the shadow camera(s), if any
 
       godrays = xml.find('godrays')
       sunmask = xml.find('sunmask')

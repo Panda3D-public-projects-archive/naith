@@ -78,5 +78,8 @@ class Camera:
     self.zoomTask = None
 
 
+  def oobe(self):
+    base.oobe()
+
   def setZoomed(self,s):
     self.zoomed = s
