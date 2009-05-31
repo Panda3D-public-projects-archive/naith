@@ -74,6 +74,7 @@
   </obj>
 
   <obj type="MethodOnKey" name="assortedKeys">
+    <action key="f6" plugin="camera" method="oobe"/>
     <action key="f7" plugin="window" method="toggleWireframe"/>
     <action key="f9" plugin="player" method="reset"/>
     <action key="f10" plugin="profile" method="go"/>

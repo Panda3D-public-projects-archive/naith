@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pandac.PandaModules import CardMaker, Texture, ModelRoot, ColorBlendAttrib, DecalEffect, NodePath, Point2, Point3
+from pandac.PandaModules import CardMaker, Texture, ModelRoot, ColorBlendAttrib, DecalEffect, NodePath, Point2, Point3, BitMask32
 from random import random
 
 BULLETHOLE_SIZE = 0.05
@@ -57,6 +57,8 @@ class BulletHoles:
     parent.setTexture(self.texture)
     parent.setTransparency(True)
     parent.setShaderOff(1)
+    parent.hide(BitMask32.bit(2)) # Invisible to volumetric lighting camera (speedup)
+    paretn.hide(BitMask32.bit(3)) # Invisible to shadow cameras (speedup)
 
   def destroy(self):
     self.container.removeNode()

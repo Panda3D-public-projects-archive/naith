@@ -86,6 +86,8 @@ class Level:
         self.ambLight.setColor(VBase4(1.0,1.0,1.0,1.0))
         self.ambLightNode = self.rend.attachNewNode(self.ambLight)
         self.rend.setLight(self.ambLightNode)
+        # Let's hide it from the shadowcam for now.
+        self.rend.hide(BitMask32.bit(3))
         yield
 
     # The collision geometry...

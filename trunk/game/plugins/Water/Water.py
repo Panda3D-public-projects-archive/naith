@@ -51,6 +51,7 @@ class Water:
     self.surface.reparentTo(render)
     self.surface.hide(BitMask32.bit(1)) # Invisible to reflection camera (speedup)
     self.surface.hide(BitMask32.bit(2)) # Invisible to volumetric lighting camera (speedup)
+    self.surface.hide(BitMask32.bit(3)) # Invisible to shadow cameras (speedup)
     self.surface.setShader(loader.loadShader('data/shaders/water.cg'))
     self.surface.setShaderInput('time', 0.0, 0.0, 0.0, 0.0)
     ntex = loader.loadTexture('data/textures/water-normal.png')
@@ -81,6 +82,7 @@ class Water:
       self.sky.hide(BitMask32.bit(0)) # Hide for normal camera
       self.sky.show(BitMask32.bit(1)) # Show for reflection camera
       self.sky.hide(BitMask32.bit(2)) # Hide for volumetric lighting camera
+      self.sky.hide(BitMask32.bit(3)) # Hide for shadow camera(s), if any
     else:
       self.sky = None
     self.wcamera.reparentTo(render)
