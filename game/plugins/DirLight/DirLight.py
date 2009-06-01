@@ -13,16 +13,14 @@
 # limitations under the License.
 
 
-from pandac.PandaModules import VBase4, BitMask32
+from pandac.PandaModules import NodePath, VBase4, BitMask32
 from pandac.PandaModules import DirectionalLight as PDirectionalLight
 
 class DirLight:
   """Creates a simple directional light"""
   def __init__(self,manager,xml):
     self.light = PDirectionalLight('dlight')
-    # We want to reparent it to the camera with a compass effect.
-    # It doesn't make any difference, except with shadows enabled.
-    self.lightNode = base.camera.attachNewNode(self.light)
+    self.lightNode = NodePath(self.light)
     self.lightNode.setCompass()
     if hasattr(self.lightNode.node(), "setCameraMask"):
       self.lightNode.node().setCameraMask(BitMask32.bit(3))
@@ -47,9 +45,14 @@ class DirLight:
 
     lens = xml.find('lens')
     if lens!=None and hasattr(self.lightNode.node(), 'getLens'):
+      if bool(int(lens.get('auto'))):
+        self.lightNode.reparentTo(base.camera)
+      else:
+        self.lightNode.reparentTo(render)
       lobj = self.lightNode.node().getLens()
       lobj.setNearFar(float(lens.get('near', 1.0)), float(lens.get('far', 100000.0)))
       lobj.setFilmSize(float(lens.get('width', 1.0)), float(lens.get('height', 1.0)))
+      lobj.setFilmOffset(float(lens.get('x', 0.0)), float(lens.get('y', 0.0)))
 
     if hasattr(self.lightNode.node(), 'setShadowCaster'):
       shadows = xml.find('shadows')

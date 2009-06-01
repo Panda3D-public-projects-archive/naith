@@ -27,10 +27,15 @@
   <obj type="Water" name="water">
   </obj>
 
+  <obj type="AmbLight" name="ambient">
+    <color r="0.625" g="0.5" b="0.15625"/>
+  </obj>
+
   <obj type="DirLight" name="sun">
     <color r="5.0" g="4.0" b="1.25"/>
-    <lookAt x="50000" y="-200" z="-50000"/>
-    <lens near="-10" far="10" width="10" height="10"/>
+    <lookAt x="0.647" y="0.740" z="-1"/>
+    <lens near="-30" far="10" width="27" height="18" x="21" y="0" auto="0"/>
+    <shadows width="2048" height="2048" bias="0.001"/>
   </obj>
 
   <obj type="Filters" config="filters">
