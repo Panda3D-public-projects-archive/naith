@@ -81,13 +81,13 @@ class Level:
         time.sleep(0.05)
         yield
       
+      # Let's hide it from the shadowcam for now.
+      self.rend.hide(BitMask32.bit(3))
       if self.rendAmb:
         self.ambLight = AmbientLight('Ambient Light')
         self.ambLight.setColor(VBase4(1.0,1.0,1.0,1.0))
         self.ambLightNode = self.rend.attachNewNode(self.ambLight)
         self.rend.setLight(self.ambLightNode)
-        # Let's hide it from the shadowcam for now.
-        self.rend.hide(BitMask32.bit(3))
         yield
 
     # The collision geometry...
