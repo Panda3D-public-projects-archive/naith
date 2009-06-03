@@ -1,0 +1,46 @@
+<config>
+  <obj type="Include" config="base"/>
+  <obj type="Level" name="level">
+    <render filename="cove/cove"/>
+    <collide filename="cove/cove"/>
+    <things filename="cove/cove-things"/>
+  </obj>
+
+  <obj type="StaticObject" name="tree">
+    <isa source="level" name="Tree"/>
+    <mesh filename="trees/palmtree1"/>
+  </obj>
+
+  <obj type="StaticObject" name="floor">
+    <physics type="plane" surface="default"/>
+    <instance z="-1"/>
+  </obj>
+
+  <obj type="Sky" name="sky">
+    <background r="0.83" g="0.95" b="0.95"/>
+    <skydome filename="early.png"/>
+    <sunmask filename="early_mask.png"/>
+    <sunorigin x="-0.647" y="-0.740" z="0.181"/>
+    <godrays r="1.0" g="0.8" b="0.25"/>
+  </obj>
+
+  <obj type="Water" name="water">
+  </obj>
+
+  <obj type="AmbLight" name="ambient">
+    <color r="0.625" g="0.5" b="0.15625"/>
+  </obj>
+
+  <obj type="DirLight" name="sun">
+    <color r="5.0" g="4.0" b="1.25"/>
+    <lookAt x="0.647" y="0.740" z="-1"/>
+    <lens near="-30" far="10" width="27" height="18" x="21" y="0" auto="0"/>
+    <shadows width="2048" height="2048" bias="0.001"/>
+  </obj>
+
+  <obj type="Filters" config="filters">
+    <hdr type="1"/>
+    <perpixel/>
+    <bloom size="medium"/>
+  </obj>
+</config>
