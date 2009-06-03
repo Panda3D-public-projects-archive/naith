@@ -6,11 +6,6 @@
     <things filename="cove/cove-things"/>
   </obj>
 
-  <obj type="StaticObject" name="tree">
-    <isa source="level" name="Tree"/>
-    <mesh filename="trees/palmtree1"/>
-  </obj>
-
   <obj type="StaticObject" name="floor">
     <physics type="plane" surface="default"/>
     <instance z="-1"/>
