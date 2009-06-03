@@ -1,3 +1,3 @@
 #! /bin/bash
 
-python main.py start
+python main.py cove
