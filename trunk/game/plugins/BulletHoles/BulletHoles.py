@@ -53,7 +53,7 @@ class BulletHoles:
     # I have yet to see a performance loss.
     # The clearTexture() is a necessary hack.
     parent.clearTexture()
-    parent.flattenStrong()
+    #parent.flattenStrong()
     parent.setTexture(self.texture)
     parent.setTransparency(True)
     parent.setShaderOff(1)
