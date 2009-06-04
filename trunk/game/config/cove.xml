@@ -11,6 +11,13 @@
     <instance z="-1"/>
   </obj>
 
+  <obj type="PhysicsObject" name="boulder">
+    <isa source="level" name="Boulder"/>
+    <mesh filename="rocks/boulder"/>
+    <physics type="mesh" surface="rock" mass="3000.0" filename="rocks/boulder"/>
+    <damping linear="2000.0" angular="10.0"/>
+  </obj>
+
   <obj type="Sky" name="sky">
     <background r="0.83" g="0.95" b="0.95"/>
     <skydome filename="early.png"/>
