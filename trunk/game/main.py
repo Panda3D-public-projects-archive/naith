@@ -35,7 +35,7 @@ def firstLight(task):
   if len(sys.argv)>1:
     cn = sys.argv[1]
   else:
-    cn = 'start'
+    cn = 'cove'
   
   print 'Starting configuration', cn
   plugin.transition(cn)
