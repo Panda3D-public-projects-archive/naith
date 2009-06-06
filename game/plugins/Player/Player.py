@@ -153,74 +153,25 @@ class Player:
     # We also need to store that a jump has been requested...
     self.doJump = False
     self.midJump = False
-    self.lowVert = None # Lowest point of collision for the player each frame - to detect if they are on the floor or not
+    self.surNormal = None # Surface normal the player is standing on.
     self.lastOnFloor = 0.0 # How long ago since the player was on the floor - we give a threshold before we stop allowing jumping. Needed as ODE tends to make you alternate between touching/not touching.
 
     # Need to know if we are crouching or not...
     self.crouching = False
     self.crouchingTarget = False
 
+    # Used to slow the player down as they walk up a ramp...
+    self.forceFalloff = 1.0
 
+
+  # Player task - basically handles crouching as everything else is too physics engine dependent to be per frame...
   def playerTask(self,task):
-    # Do lots of player calculation stuff - this includes movememnt forces, crouching etc...
-    
-    # Get the stuff we need - current velocity, target velocity and length of time step...
-    vel = self.body.getLinearVel()
-    targVel = self.feet.getPos()
-    self.feet.setPos(0.0,0.0,0.0)
     dt = globalClock.getDt()
-
-    # Find out if the player is touching the floor or not - we check if the bottom hemisphere has touched anything - this uses the lowest collision point callback setup below...
-    playerLoc = self.stomach.getPos(render)
-    if self.crouching: # radius is reduces below to prevent the player climbing really steep ramps.
-      playerKneeHeight = playerLoc[2] - self.crouchHeight*0.5 + self.radius*0.75
-    else:
-      playerKneeHeight = playerLoc[2] - self.height*0.5 + self.radius*0.75
-    if (self.lowVert!=None) and (self.lowVert[2]<playerKneeHeight):
-      self.lastOnFloor = 0.0
-    else:
-      self.lastOnFloor += dt
-    onFloor = self.lastOnFloor<self.jumpThreshold
-
-    # Update feet direction to be pointing in the same direction as the neck - so we walk forwards...
-    self.feet.setQuat(self.neck.getQuat())
-
-    # Calculate the total force we would *like* to apply...
-    force = targVel - vel
-    force *= self.mass/dt
-
-    # Cap the liked force by how strong the player actually is...
-    forceCap = self.playerBaseImpulse
-    if onFloor: forceCap += self.playerImpulse
-    forceCap *= dt # Not really ideal - should really do this per physics step.
-
-    force[0] = max(min(force[0],forceCap),-forceCap)
-    force[1] = max(min(force[1],forceCap),-forceCap)
-    force[2] = 0.0 # Can't fight gravity
-
-    # Add to the liked force any pending jump, if allowed...
-    if self.doJump and onFloor and not self.midJump:
-      force[2] += self.jumpForce
-      self.midJump = True
-    self.doJump = False
-
-    # Apply air resistance to the player - only for falling - air resistance is direction dependent!
-    if vel[2]<0.0:
-      force[2] -= self.airResistance*vel[2]*vel[2]
-      self.midJump = False
-
-    # Apply the force...
-    self.body.addForce(force)
-
-    # Simple hack to limit how much air the player gets off the top of ramps - need a better solution. It still allows for some air and other solutions involve the player punching through ramps...
-    if (not onFloor) and (not self.midJump) and (vel[2]>0.0):
-      vel[2] = 0.0
-      self.body.setLinearVel(vel)
-
+    
     # Crouching - this switches between the two cylinders immediatly on a mode change...
     if self.crouching!=self.crouchingTarget:
       if self.crouchingTarget:
-        # Going down - allways possible...
+        # Going down - always possible...
         self.crouching = self.crouchingTarget
 
         self.colStanding.setCategoryBits(BitMask32(0))
@@ -261,7 +212,7 @@ class Player:
           self.stomach.setPos(self.stomach,offset)
           self.view.setPos(self.view,-offset)
 
-    # Crouching - this makes the height height head towards the correct height, to give the perception that crouching takes time...
+    # Crouching - this makes the height head towards the correct height, to give the perception that crouching takes time...
     currentHeight = self.view.getZ() - self.neck.getZ()
     if self.crouching:
       targetHeight = self.crouchHeadHeight - 0.5*self.crouchHeight
@@ -275,8 +226,81 @@ class Player:
 
 
   def playerPrePhysics(self):
-    # Pre collision - we have to reset the record of the lowest point the player is standing on ready for the collision callbacks to recalculate it...
-    self.lowVert = None
+    # Get the stuff we need - current velocity, target velocity and length of time step...
+    vel = self.body.getLinearVel()
+    targVel = self.feet.getPos()
+    dt = self.ode.getDt()
+
+    # Rotate the target velocity to account for the players facing direction...
+    rot = Mat3()
+    self.neck.getQuat().extractToMatrix(rot)
+    targVel = rot.xformVecGeneral(targVel)
+
+    # Find out if the player is touching the floor or not - we check if the bottom hemisphere has touched anything - this uses the lowest collision point from the last physics step...
+    if (self.surNormal!=None) and (self.surNormal[2]>0.0):
+      self.lastOnFloor = 0.0
+    else:
+      self.lastOnFloor += dt
+    onFloor = self.lastOnFloor<self.jumpThreshold
+
+    # Calculate the total force we would *like* to apply...
+    force = targVel - vel
+    force *= self.mass/dt
+    
+    # Cap the liked force by how strong the player actually is and fix the player to apply force in the direction of the floor...
+    forceCap = self.playerBaseImpulse
+    if onFloor: forceCap += self.playerImpulse
+    forceCap *= dt
+
+    if self.surNormal==None:
+      force[2] = 0.0
+    else:
+      # This projects the force into the plane of the surface the player is standing on...
+      fx  = force[0] * (1.0-self.surNormal[0]*self.surNormal[0])
+      fx += force[1] * -self.surNormal[0]*self.surNormal[1]
+      fx += force[2] * -self.surNormal[0]*self.surNormal[2]
+
+      fy  = force[0] * -self.surNormal[1]*self.surNormal[0]
+      fy += force[1] * (1.0-self.surNormal[1]*self.surNormal[1])
+      fy += force[2] * -self.surNormal[1]*self.surNormal[2]
+
+      fz  = force[0] * -self.surNormal[2]*self.surNormal[0]
+      fz += force[1] * -self.surNormal[2]*self.surNormal[1]
+      fz += force[2] * (1.0-self.surNormal[2]*self.surNormal[2])
+
+      force[0] = fx
+      force[1] = fy
+      force[2] = fz
+
+      # If the ramp is too step, you get no force - and fall back down again...
+      if force[2]>1e-3:
+        forceCap *= max(self.surNormal[2] - 0.8,0.0)/(1.0-0.8)
+
+    fLen = force.length()
+    if fLen>forceCap:
+      force *= forceCap/fLen
+
+    # Add to the liked force any pending jump, if allowed...
+    if self.doJump and onFloor and not self.midJump:
+      force[2] += self.jumpForce
+      self.midJump = True
+    self.doJump = False
+
+    # Apply air resistance to the player - only for falling - air resistance is direction dependent!
+    if vel[2]<0.0:
+      force[2] -= self.airResistance*vel[2]*vel[2]
+      self.midJump = False
+
+    # Apply the force...
+    self.body.addForce(force)
+
+    # Simple hack to limit how much air the player gets off the top of ramps - need a better solution. It still allows for some air and other solutions involve the player punching through ramps...
+    if (not onFloor) and (not self.midJump) and (vel[2]>0.0):
+      vel[2] = 0.0
+      self.body.setLinearVel(vel)    
+    
+    # We have to reset the record of the lowest point the player is standing on ready for the collision callbacks to recalculate it ready for the next run of this handler...
+    self.surNormal = None
 
 
   def playerPostPhysics(self):
@@ -287,11 +311,14 @@ class Player:
 
 
   def onPlayerCollide(self,entry,which):
-    # Handles the players collisions - used to work out the lowest point the player is in contact with, to determine if they are standing on the floor or not...
+    # Handles the players collisions - used to work out the orientation of the surface the player is standing on...
     for i in xrange(entry.getNumContacts()):
-      v = entry.getContactPoint(i)
-      if self.lowVert==None or self.lowVert[2]>v[2]:
-        self.lowVert = v
+      n = entry.getContactGeom(i).getNormal()
+      if which:
+        n != -1.0
+
+      if self.surNormal==None or n[2]>self.surNormal[2]:
+        self.surNormal = n
 
 
   def start(self):

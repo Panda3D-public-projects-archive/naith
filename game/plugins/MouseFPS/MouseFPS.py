@@ -16,11 +16,14 @@
 
 from pandac.PandaModules import *
 import direct.directbase.DirectStart
+from pandac.PandaModules import PandaSystem
 
 
 class MouseFPS:
   """Provides fps style mouse control, sending the data to arbitary nodes"""
   def __init__(self,manager,xml):
+    self.reset = False
+    
     self.reload(manager,xml)
 
 
@@ -73,9 +76,14 @@ class MouseFPS:
 
 
   def mouseTask(self,task):
+    if self.reset: # It seems that reseting the mouse pointer sometimes take a frame, threfore after a reset ignore the mouse for the next frame. Bad, yes, but better than a flick.
+      self.reset = False
+      return task.cont
+
     md = base.win.getPointer(0)
     ox = md.getX() - self.originX
     oy = md.getY() - self.originY
+    #print ox,oy,md.getX(),md.getY(),self.originX,self.originY
     self.originX = md.getX()
     self.originY = md.getY()
 
@@ -86,11 +94,13 @@ class MouseFPS:
 
     xoob = self.originX<base.win.getXSize()//4 or self.originX>(base.win.getXSize()*3)//4
     yoob = self.originY<base.win.getYSize()//4 or self.originY>(base.win.getYSize()*3)//4
-    if xoob or yoob:
+    if xoob or yoob or (PandaSystem.getMinorVersion() >= 7): # Change all this with release of 1.7 series.
       cx = base.win.getXSize()//2
       cy = base.win.getYSize()//2
       if base.win.movePointer(0,cx,cy):
         self.originX = cx
         self.originY = cy
+        self.reset = True
+        #print 'reset'
 
     return task.cont
