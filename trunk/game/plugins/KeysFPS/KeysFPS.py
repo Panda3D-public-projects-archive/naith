@@ -68,7 +68,7 @@ class KeysFPS(DirectObject.DirectObject):
     walk = float(self.forward-self.backward) * speed
     strafe = float(self.right-self.left) * speed
     
-    self.node.setPos(self.node,strafe,walk,0.0)
+    self.node.setPos(strafe,walk,0.0)
     
     return task.cont
 

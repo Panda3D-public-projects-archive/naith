@@ -166,6 +166,9 @@ class InitODE(DirectObject.DirectObject):
       print 'Warning: Surface %s does not exist'%name
       return 0
 
+  def getDt(self):
+    return self.step
+
 
   def regBodySynch(self,node,body):
     """Given a NodePath and a Body this arranges that the NodePath tracks the Body."""
