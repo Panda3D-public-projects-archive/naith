@@ -71,7 +71,6 @@ class DeveloperConsole(DirectObject):
       self.addText(lines.strip('\n').split('\n'))
   
   def command(self, text):
-    text = text.strip()
     if not self.hidden:
       self.cscroll = None
       self.command = ''
@@ -83,41 +82,16 @@ class DeveloperConsole(DirectObject):
         return
       if len(self.commands) == 0 or self.commands[-1] != text:
         self.commands.append(text)
-      if '.' in text:
-        try:
-          plugin, method = text.split('.')
-        except:
-          self.addText('Usage: plugin.method or plugin.property')
-          return
-      else:
-        plugin = text
-        method = None
       
-      # Find the given plugin
-      plugin = self.manager.get(plugin)
-      if plugin == None:
-        self.addText('No such plugin')
-        return
+      # Insert plugins into the local namespace
+      for plugin in self.manager.named.keys():
+        locals()[plugin] = self.manager.named[plugin]
       
-      # If we didn't specify a method, print out plugin info.
-      if method == None:
-        self.addText(str(plugin).strip('<>'))
-        return
-      
-      # Find the given method / property
-      if not hasattr(plugin, method):
-        self.addText('No such method or property')
-        return
-      function = getattr(plugin, method)
-      
-      # If it's callable, call it and print the result, otherwise, just print it
+      # Run it and print the output.
       try:
-        if isinstance(function, Callable):
-          output = function()
-          if output != None:
-            self.addText(str(output))
-        else:
-          self.addText(str(function))
+        output = eval(text)
+        if output != None:
+          self.addText(str(output))
       except:
         # Whoops! Print out a traceback.
         self.addText(traceback.format_exc())
