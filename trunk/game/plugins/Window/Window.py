@@ -14,6 +14,7 @@
 
 from pandac.PandaModules import *
 from direct.directbase import DirectStart
+from sys import exit
 
 class Window:
   """This plugin creates a window for rendering into."""
@@ -24,4 +25,5 @@ class Window:
   
   screenshot = lambda self: base.screenshot()
   wireframe  = lambda self: base.toggleWireframe()
+  close      = lambda self: exit()
 
