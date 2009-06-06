@@ -25,5 +25,4 @@ class Window:
   
   screenshot = lambda self: base.screenshot()
   wireframe  = lambda self: base.toggleWireframe()
-  close      = lambda self: exit()
 
