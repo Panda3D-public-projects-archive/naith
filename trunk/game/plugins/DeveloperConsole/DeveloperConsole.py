@@ -33,6 +33,7 @@ class DeveloperConsole(DirectObject):
     self.commands = []  # All previously sent commands
     self.cscroll = None # Index of currently navigated command, None if current
     self.command = ''   # Currently entered command
+    self.pure = bool(xml.get('pure'))
     self.hide()
   
   def prevCommand(self):
@@ -84,12 +85,15 @@ class DeveloperConsole(DirectObject):
         self.commands.append(text)
       
       # Insert plugins into the local namespace
+      manager = self.manager
       for plugin in self.manager.named.keys():
         locals()[plugin] = self.manager.named[plugin]
       
       # Run it and print the output.
       try:
         output = eval(text)
+        if isinstance(output, Callable) and not self.pure:
+          output = output()
         if output != None:
           self.addText(str(output))
       except:
