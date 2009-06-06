@@ -17,7 +17,6 @@ from direct.showbase.DirectObject import DirectObject
 from direct.gui.DirectGui import DirectFrame, DirectEntry
 from direct.gui.OnscreenText import OnscreenText
 import sys, traceback
-from collections import Callable
 
 TEXT_MARGIN = (0.03, -0.06)
 
@@ -92,7 +91,7 @@ class DeveloperConsole(DirectObject):
       # Run it and print the output.
       try:
         output = eval(text)
-        if isinstance(output, Callable) and not self.pure:
+        if hasattr(output, '__call__') and not self.pure:
           output = output()
         if output != None:
           self.addText(str(output))
