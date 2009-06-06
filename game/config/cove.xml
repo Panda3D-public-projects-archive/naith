@@ -11,6 +11,11 @@
     <instance z="-1"/>
   </obj>
 
+  <obj type="StaticObject" name="tree">
+    <isa source="level" name="PalmTree"/>
+    <mesh filename="trees/palmtree1"/>
+  </obj>
+
   <obj type="PhysicsObject" name="boulder">
     <isa source="level" name="Boulder"/>
     <mesh filename="rocks/boulder"/>
