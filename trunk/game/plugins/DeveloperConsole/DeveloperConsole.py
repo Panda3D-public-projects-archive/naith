@@ -104,7 +104,9 @@ class DeveloperConsole(DirectObject):
 
   def show(self):
     self.accept('arrow_up', self.prevCommand)
+    self.accept('arrow_up-repeat', self.prevCommand)
     self.accept('arrow_down', self.nextCommand)
+    self.accept('arrow_down-repeat', self.nextCommand)
     self.hidden = False
     self.entry['focus'] = True
     self.frame.show()
