@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pandac.PandaModules import CardMaker, Texture, ModelRoot, ColorBlendAttrib, DecalEffect, NodePath, Point2, Point3, BitMask32
+from pandac.PandaModules import CardMaker, Texture, ModelRoot, ColorBlendAttrib, TransparencyAttrib, DecalEffect, NodePath, Point2, Point3, BitMask32
 from random import random
 
 BULLETHOLE_SIZE = 0.05
@@ -55,7 +55,7 @@ class BulletHoles:
     parent.clearTexture()
     parent.flattenStrong()
     parent.setTexture(self.texture)
-    parent.setTransparency(True)
+    parent.setTransparency(TransparencyAttrib.MDual)
     parent.setShaderOff(1)
     parent.hide(BitMask32.bit(2)) # Invisible to volumetric lighting camera (speedup)
     parent.hide(BitMask32.bit(3)) # Invisible to shadow cameras (speedup)
