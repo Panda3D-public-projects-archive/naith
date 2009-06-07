@@ -41,15 +41,14 @@
   </obj>
 
   <obj type="DirLight" name="sunlight">
-    <color r="5.0" g="4.0" b="1.25"/>
+    <color r="4.0" g="3.2" b="1.0"/>
     <lookAt x="0.647" y="0.740" z="-1"/>
     <lens near="-30" far="10" width="27" height="18" x="21" y="0" auto="0"/>
   </obj>
 
   <obj type="Filters" config="filters">
-    <hdr type="2"/>
+    <hdr type="1"/>
     <perpixel/>
-    <bloom size="small"/>
-    <showbuffers/>
+    <bloom size="medium"/>
   </obj>
 </config>
