@@ -122,10 +122,10 @@ class DeveloperConsole(InteractiveInterpreter, DirectObject):
           self.block += '\n' + text
         else:
           self.otext['text'] = ':'
-          self.block = ''
-      except:
+          self.block = ''      
+      except Exception: # Not just "except", it will also catch SystemExit
         # Whoops! Print out a traceback.
-        self.append(traceback.format_exc())
+        self.writeErr(traceback.format_exc())
 
   def toggle(self):
     if self.hidden:
