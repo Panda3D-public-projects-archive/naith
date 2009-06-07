@@ -36,13 +36,13 @@ class DeveloperConsole(InteractiveInterpreter, DirectObject):
     sys.stdout = PseudoFile(self.writeOut)
     sys.stderr = PseudoFile(self.writeErr)
     tpErr = TextProperties()
-    tpErr.setTextColor(1, 0, 0, 1)
+    tpErr.setTextColor(1, 0.5, 0.5, 1)
     TextPropertiesManager.getGlobalPtr().setProperties("err", tpErr)
     self.manager = manager
     font = loader.loadFont("cmss12")
     self.frame = DirectFrame(parent = base.a2dTopCenter, text_align = TextNode.ALeft, text_pos = (-base.getAspectRatio() + TEXT_MARGIN[0], TEXT_MARGIN[1]), text_scale = 0.05, text_fg = (1, 1, 1, 1), frameSize = (-2.0, 2.0, -0.5, 0.0), frameColor = (0, 0, 0, 0.5), text = '', text_font = font)
-    self.entry = DirectEntry(parent = base.a2dTopLeft, command = self.command, scale = 0.05, width = 1000.0, pos = (-0.02, 0, -0.48), relief = None, text_pos = (1.5, 0, 0), text_fg = (0.5, 0, 0, 1), rolloverSound = None, clickSound = None, text_font = font)
-    self.otext = OnscreenText(parent = self.entry, scale = 1, align = TextNode.ALeft, pos = (1, 0, 0), fg = (1, 1, 1, 1), text = ':', font = font)
+    self.entry = DirectEntry(parent = base.a2dTopLeft, command = self.command, scale = 0.05, width = 1000.0, pos = (-0.02, 0, -0.48), relief = None, text_pos = (1.5, 0, 0), text_fg = (1, 1, 0.5, 1), rolloverSound = None, clickSound = None, text_font = font)
+    self.otext = OnscreenText(parent = self.entry, scale = 1, align = TextNode.ALeft, pos = (1, 0, 0), fg = (1, 1, 0.5, 1), text = ':', font = font)
     self.lines = [''] * 9
     self.commands = []  # All previously sent commands
     self.cscroll = None # Index of currently navigated command, None if current
