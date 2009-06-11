@@ -88,7 +88,6 @@ class Water:
     self.wcamera.reparentTo(render)
     self.wcamera.node().setLens(base.camLens)
     self.wcamera.node().setCameraMask(BitMask32.bit(1))
-    self.wcamera.node().setInitialState(RenderState.make(CullFaceAttrib.makeReverse()))
     self.surface.hide(BitMask32.bit(1))
     wtexture = self.wbuffer.getTexture()
     wtexture.setWrapU(Texture.WMClamp)
@@ -99,6 +98,7 @@ class Water:
     self.wplanenp = render.attachNewNode(PlaneNode('water', self.wplane))
     tmpnp = NodePath('StateInitializer')
     tmpnp.setClipPlane(self.wplanenp)
+    tmpnp.setAttrib(CullFaceAttrib.makeReverse())
     self.wcamera.node().setInitialState(tmpnp.getState())
 
     #self.fog = Fog('UnderwaterFog')
