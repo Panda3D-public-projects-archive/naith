@@ -19,6 +19,7 @@ from pandac.PandaModules import *
 def eggToOde(np,surfaceType): # ,depth = 0
   """Given a node path, usually from an egg that has been octreed, this constructs the same structure in ode, using a space for each node with tri-meshes within. Implimented as a generator so it doesn't screw with the framerate; final yield will return the root geom, or None if there was nothing to collide with. (This geom will probably be a space, but only probably.)"""
   output = []
+  np.flattenLight()
 
   # Check if there is any mesh data at this level that we need to turn into a trimesh...
   if np.node().isGeomNode(): # np.node().getClassType()==CollisionNode.getClassType()
