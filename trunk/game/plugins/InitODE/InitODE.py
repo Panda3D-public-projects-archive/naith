@@ -169,6 +169,9 @@ class InitODE(DirectObject.DirectObject):
   def getDt(self):
     return self.step
 
+  def getRemTime(self):
+    return self.timeRem
+
 
   def regBodySynch(self,node,body):
     """Given a NodePath and a Body this arranges that the NodePath tracks the Body."""
