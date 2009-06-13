@@ -294,10 +294,10 @@ class Player:
     # Apply the force...
     self.body.addForce(force)
 
-    # Simple hack to limit how much air the player gets off the top of ramps - need a better solution. It still allows for some air and other solutions involve the player punching through ramps...
+    # Simple hack to limit how much air the player gets off the top of ramps - need a better solution. It still allows for some air, but other solutions involve the player punching through ramps...
     if (not onFloor) and (not self.midJump) and (vel[2]>0.0):
       vel[2] = 0.0
-      self.body.setLinearVel(vel)    
+      self.body.setLinearVel(vel)
     
     # We have to reset the record of the lowest point the player is standing on ready for the collision callbacks to recalculate it ready for the next run of this handler...
     self.surNormal = None
@@ -307,7 +307,8 @@ class Player:
     # Stop the player falling over, update the node position to match...
     self.body.setQuaternion(Quat())
     self.body.setTorque(0.0,0.0,0.0)
-    self.stomach.setPos(render,self.body.getPosition())
+    pp = self.body.getPosition() + self.body.getLinearVel()*self.ode.getRemTime() # Interpolation from physics step for smoother movement - due to physics being on a constant frame rate.
+    self.stomach.setPos(render,pp)
 
 
   def onPlayerCollide(self,entry,which):
@@ -315,7 +316,7 @@ class Player:
     for i in xrange(entry.getNumContacts()):
       n = entry.getContactGeom(i).getNormal()
       if which:
-        n != -1.0
+        n *= -1.0
 
       if self.surNormal==None or n[2]>self.surNormal[2]:
         self.surNormal = n
