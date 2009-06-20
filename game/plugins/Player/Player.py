@@ -149,8 +149,9 @@ class Player:
     self.standCheck = OdeSphereGeom(self.radius)
     self.standCheck.setCategoryBits(BitMask32(0xFFFFFFFE))
     self.standCheck.setCollideBits(BitMask32(0xFFFFFFFE))
+    
 
-    # We also need to store that a jump has been requested...
+    # We also need to store when a jump has been requested...
     self.doJump = False
     self.midJump = False
     self.surNormal = None # Surface normal the player is standing on.
@@ -231,10 +232,21 @@ class Player:
     targVel = self.feet.getPos()
     dt = self.ode.getDt()
 
-    # Rotate the target velocity to account for the players facing direction...
-    rot = Mat3()
-    self.neck.getQuat().extractToMatrix(rot)
-    targVel = rot.xformVecGeneral(targVel)
+    # Check if the player is standing still or moving - if moving try and obtain the players target velocity, otherwsie try to stand still, incase the player is on a slope and otherwise liable to slide (Theres a threshold to keep behaviour nice - slope too steep and you will slide.)...
+    if targVel.lengthSquared()<1e-2 and vel.lengthSquared()<1e-1:
+      # Player standing still - head for last standing position...
+      targVel = self.targPos - self.stomach.getPos()
+      targVel /= 0.1 # Restoration time
+      targVel[2] = 0.0 # Otherwise a vertical drop onto a slope can causes the player to do mini jumps to try and recover (!).
+    else:
+      # Player moving - use targVel and update last standing position...
+      self.targPos = self.stomach.getPos()
+
+      # Rotate the target velocity to account for the players facing direction...
+      rot = Mat3()
+      self.neck.getQuat().extractToMatrix(rot)
+      targVel = rot.xformVecGeneral(targVel)
+
 
     # Find out if the player is touching the floor or not - we check if the bottom hemisphere has touched anything - this uses the lowest collision point from the last physics step...
     if (self.surNormal!=None) and (self.surNormal[2]>0.0):
@@ -272,7 +284,7 @@ class Player:
       force[1] = fy
       force[2] = fz
 
-      # If the ramp is too step, you get no force - and fall back down again...
+      # If the ramp is too steep, you get no force - and fall back down again...
       if force[2]>1e-3:
         forceCap *= max(self.surNormal[2] - 0.8,0.0)/(1.0-0.8)
 
@@ -280,7 +292,7 @@ class Player:
     if fLen>forceCap:
       force *= forceCap/fLen
 
-    # Add to the liked force any pending jump, if allowed...
+    # Add to the force so far any pending jump, if allowed...
     if self.doJump and onFloor and not self.midJump:
       force[2] += self.jumpForce
       self.midJump = True
@@ -304,9 +316,11 @@ class Player:
 
 
   def playerPostPhysics(self):
-    # Stop the player falling over, update the node position to match...
+    # Zero out all rotation...
     self.body.setQuaternion(Quat())
-    self.body.setTorque(0.0,0.0,0.0)
+    self.body.setAngularVel(Vec3(0.0,0.0,0.0))
+    
+    # Update the panda node position to match the ode body position...
     pp = self.body.getPosition() + self.body.getLinearVel()*self.ode.getRemTime() # Interpolation from physics step for smoother movement - due to physics being on a constant frame rate.
     self.stomach.setPos(render,pp)
 
@@ -358,6 +372,8 @@ class Player:
     self.stomach.setPos(self.stomach,0.0,0.0,0.5*self.height)
     self.body.setPosition(self.stomach.getPos(render))
     self.body.setLinearVel(Vec3(0.0,0.0,0.0))
+
+    self.targPos = self.stomach.getPos()
 
 
   def crouch(self):
