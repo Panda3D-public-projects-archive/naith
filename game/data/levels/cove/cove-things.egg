@@ -1,6 +1,6 @@
 <CoordinateSystem> { Z-up }
 
-<Comment> { "Egg laid by Chicken for Blender, version R70" }
+<Comment> { "Egg laid by Chicken for Blender, version " }
 
 <Group> Boulder {
   <Transform> {
@@ -36,6 +36,30 @@
     }
   }
   <Tag> IsA { PlayerStart }
+  <ObjectType> { model }
+}
+<Group> palmtree.008 {
+  <Transform> {
+    <Matrix4> {
+      -0.572147 -0.470199 0.116335 0.000000
+      0.470865 -0.582867 -0.040049 0.000000
+      0.121226 0.044584 0.776399 0.000000
+      34.120167 -2.871603 0.181324 1.000000
+    }
+  }
+  <Tag> IsA { PalmTree }
+  <ObjectType> { model }
+}
+<Group> palmtree.009 {
+  <Transform> {
+    <Matrix4> {
+      -0.535425 0.401056 0.272314 0.000000
+      -0.542773 -0.587676 -0.201692 0.000000
+      0.081741 -0.264196 0.549820 0.000000
+      36.644840 -3.675809 0.196159 1.000000
+    }
+  }
+  <Tag> IsA { PalmTree }
   <ObjectType> { model }
 }
 <Group> palmtree.006 {
