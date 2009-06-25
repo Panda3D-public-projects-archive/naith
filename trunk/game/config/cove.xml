@@ -2,7 +2,7 @@
   <obj type="Include" config="base"/>
   <obj type="Level" name="level">
     <render filename="cove/cove"/>
-    <collide filename="cove/cove"/>
+    <collide filename="cove/cove-collide"/>
     <things filename="cove/cove-things"/>
   </obj>
 
