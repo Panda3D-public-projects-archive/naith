@@ -18,6 +18,7 @@ from pandac.PandaModules import *
 import direct.directbase.DirectStart
 from pandac.PandaModules import PandaSystem
 
+from sys import platform
 
 class MouseFPS:
   """Provides fps style mouse control, sending the data to arbitary nodes"""
@@ -56,9 +57,10 @@ class MouseFPS:
 
 
   def start(self):
-    # Get rid of the mouse cursor...
+    # Get rid of the mouse cursor and go into relative mode.
     props = WindowProperties()
     props.setCursorHidden(True)
+    props.setMouseMode(WindowProperties.MRelative)
     base.win.requestProperties(props)
 
     # Set the mouse task going...
@@ -68,6 +70,7 @@ class MouseFPS:
     # Re-enable the mouse cursor...
     props = WindowProperties()
     props.setCursorHidden(False)
+    props.setMouseMode(WindowProperties.MAbsolute)
     base.win.requestProperties(props)
 
     # Stop the mouse task...
@@ -94,7 +97,9 @@ class MouseFPS:
 
     xoob = self.originX<base.win.getXSize()//4 or self.originX>(base.win.getXSize()*3)//4
     yoob = self.originY<base.win.getYSize()//4 or self.originY>(base.win.getYSize()*3)//4
-    if xoob or yoob or (PandaSystem.getMinorVersion() >= 7): # Change all this with release of 1.7 series.
+    
+    # OSX had relative mouse support all along, Windows never had, and 1.7.0 added it for Linux.
+    if (xoob or yoob) and platform != "darwin" and (platform.startswith("win") or PandaSystem.getMinorVersion() < 7):
       cx = base.win.getXSize()//2
       cy = base.win.getYSize()//2
       if base.win.movePointer(0,cx,cy):
