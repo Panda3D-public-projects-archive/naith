@@ -81,5 +81,6 @@
     <action key="f9" plugin="player" method="reset"/>
     <action key="f10" plugin="profile" method="go"/>
     <action key="f11" plugin="window" method="screenshot"/>
+    <action key="shift-f11" plugin="window" method="toggleRecording"/>
   </obj>
 </config>
