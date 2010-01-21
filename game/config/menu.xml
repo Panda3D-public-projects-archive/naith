@@ -1,0 +1,8 @@
+<config>
+  <obj type="Include" config="base"/>
+
+  <obj type="QuickMenu" name="menu">
+    <button text="Gameplay test" target="test"/>
+    <button text="Graphics test" target="cove"/>
+  </obj>
+</config>
