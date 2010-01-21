@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2009 Reinier de Blois, Tom SF Haines
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,6 +29,8 @@ class Window:
 
     self.task = None
 
+  def reload(self,manager,xml):
+    pass
 
   screenshot = lambda self: base.screenshot()
   wireframe  = lambda self: base.toggleWireframe()

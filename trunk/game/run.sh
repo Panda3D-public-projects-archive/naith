@@ -1,3 +1,3 @@
 #! /bin/bash
 
-python main.py cove
+python main.py menu

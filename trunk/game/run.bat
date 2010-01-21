@@ -1,4 +1,4 @@
 @ECHO OFF
 
-ppython main.py start
+ppython main.py menu
 pause

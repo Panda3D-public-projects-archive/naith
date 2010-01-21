@@ -1,5 +1,5 @@
 <config>
-  <obj type="Include" config="base"/>
+  <obj type="Include" config="playable"/>
   <obj type="Level" name="level">
     <render filename="beach/beach"/>
     <collide filename="beach/beach"/>
