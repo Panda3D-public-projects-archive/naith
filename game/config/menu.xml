@@ -3,6 +3,7 @@
 
   <obj type="QuickMenu" name="menu">
     <button text="Gameplay test" target="test"/>
-    <button text="Graphics test" target="cove"/>
+    <button text="Graphics test" target="cove-normal"/>
+    <button text="Graphics test (LQ)" target="cove"/>
   </obj>
 </config>
