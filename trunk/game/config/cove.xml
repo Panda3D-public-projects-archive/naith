@@ -27,11 +27,6 @@
     <background r="0.83" g="0.95" b="0.95"/>
     <skydome filename="early.png"/>
   </obj>
-  
-  <obj type="Sun" name="sun">
-    <isa source="level" name="Sun"/>
-    <godrays r="1.0" g="0.8" b="0.25"/>
-  </obj>
 
   <obj type="Water" name="water">
   </obj>
@@ -44,11 +39,5 @@
     <color r="4.0" g="3.2" b="1.0"/>
     <lookAt x="0.647" y="0.740" z="-1"/>
     <lens near="-30" far="10" width="27" height="18" x="21" y="0" auto="0"/>
-  </obj>
-
-  <obj type="Filters" config="filters">
-    <hdr type="1"/>
-    <perpixel/>
-    <bloom size="medium"/>
   </obj>
 </config>

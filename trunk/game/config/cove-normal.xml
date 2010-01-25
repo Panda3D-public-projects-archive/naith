@@ -1,0 +1,14 @@
+<config>
+  <obj type="Include" config="cove"/>
+
+  <obj type="Sun" name="sun">
+    <isa source="level" name="Sun"/>
+    <godrays r="1.0" g="0.8" b="0.25"/>
+  </obj>
+
+  <obj type="Filters" config="filters">
+    <hdr type="1"/>
+    <perpixel/>
+    <bloom size="medium"/>
+  </obj>
+</config>
