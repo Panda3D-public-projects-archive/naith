@@ -1,39 +1,54 @@
-= Simple Plugin System =
+=Simple Plugin System=
 
-A simple plugin system is being used - it exists primarily to allow for certain 'quick' customisations, and multiple applications from a single code base. It also handles loading screens.
+==Overview==
+
+There are three important parts to the system - _plugin_, _configuration_ and _transition_.
+
+A _plugin_ consists of a directory in the plugins folder; within that directory will be a .py file which will contain a class. The directory, .py file and class will all have the exact same name. Arbitrary additional code can exist within the plugins directory and/or file, to be used by the class. Additionally all python inside the {{{bin/shared}}} directory can be imported and used by any plugin.
+
+A game then consists of various _configurations_, each specified inside a .xml file within the config directory. Each configuration consists of a set of active plugins and parameters for them. Plugins do everything - they load levels, control the player, do menus, simulate objects, do fx etc.
+
+A _transition_ allows a change from one configuration file to another - this can be thought of as the game trashing all current plugins and creating a new set for the new configuration. In practical terms this is mostly used for loading a new level. For efficiency reasons there is extensive use of recycling however, so that plugins that are identical between configurations are simply given any new parameters and update themselves accordingly. There are also plugins where recyling is required - for instance the _Window_ plugin manages the window, so if you trash it the game will lose its window then recreate it for the new configuration - such plugins have to be recycled for continuity of game experience. Transitions can take time - this is when you expect a loading screen. This motivates a system to allow a reasonable framerate during the loading and configuration of plugins; it also requires a loading screen plugin that renders only during transitions (And normal plugins that do not render during transitions.).
+
+Further details of how the system works are given below, but the easiest way to learn is by example, so go read the code for some of the current plugins. Note however that a lot of them are rough and ready and hence break conventions, so take the below to be the gold standard.
 
 
-At any given point the game is a set of (usually) named instances of python classes - the config file lists these classes, each having its own block of xml:
+==Manager==
+The Manager class, to be found in the {{{bin}}} subdirectory, runs the show. Its interface is made available to all plugins and is documented below:
+
+  * {{{manager.transition(self,config)}}}:  Starts a transition, to the named config file. (Neither .xml or the path should not be included, i.e. {{{level}}} means the file {{{config/level.xml}}}) The transition will take time - this function will call the {{{stop()}}} method of every plugin and then return. The actual transition will then start with the next frame - it creates a task that does the work.
+  * {{{manager.end(self)}}}: Ends the program, neatly. It transitions to a state where there are no plugins before exiting - this allows plugins to close themselves down correctly.
+  * {{{manager.addObj(self,element)}}}: Given a xml element that describes a plugin this constructs and adds that plugin to the current state. This should generally not be used by plugins - it is only exposed for the {{{Include}}} plugin, which allows you to include other config files within the current one.
+  * {{{manager.get(self,name)}}}: returns the object for the named plugin, or {{{None}}} if no such named plugin exists.
+  * The {{{main.py}}} file, found in the root of the game, is run with a single parameter - the state to transition to at the start of the game. This will typically be a menu of some kind, but defaults to _start_ if no parameter is given.
+
+
+==Configurations==
+
+The config file lists all plugins to be active in a given state; it is a xml file with a root element of {{{<config> ... </config>}}} where each plugin has its own block of xml:
 
 {{{<obj type="..." name="..." ... > ... </obj>}}}
 
-Type indicates which plugin to use, name the name used by other plugins to get this plugin instance. name can be omitted to make it not indexable (Such classes will never survive a transition however.)). A plugin consists of a directory with the plugin name in the plugin folder. It will contain a .py with the plugin name that contains a class with the plugin name - this will be instanced for each obj tag with the relevant type.
+Type indicates which plugin to use, name the name used by other plugins to get this plugin instance. name can be omitted to make it not indexable (Such classes will never survive a transition however.). type is specifically the directory to get the plugin from - there is nothing to stop you having multiple instances of the same plugin. During a transition plugins will only be recycled if they explicitly support it and both configurations contain the same plugin with the same name.
+
+Plugins are initialised in the order they are declared in a file, so if a plugin has dependencies this must be taken into account. Additionally an 'Include' plugin exists - its usage is
+
+{{{<obj type="Include" config="shared_config"/>}}}
+
+This allows you to have shared configuration files, with standard plugins. This is very important to avoid duplication in specification - for instance the loading screen and Window plugins should only be entered once, inside a configuration file that is included by all further plugins. Complex hierarchies are expected, with config files dedicated to keymaps, graphics settings etc. The Include mechanism is dumb however, so care needs to be taken to not double include any files, especially as having two plugins with the same name is a bad thing.
 
 
-A plugin class has an __init__(self,manager,xml) constructor. The manager gives the plugin manager object, the xml gives the obj element that declares the instance, as a xml.etree Element from the python standard library.
+==Plugins==
+Each plugin class follows a set of conventions, most of them optional. However, you need to follow a fair few of the conventions to get an efficient plugin that plays well with the rest of the system, primarily by supporting the recycling model so that plugins are not trashed and recreated with every transition.
 
-A plugin class should also have a static method called depends - it is given the configuration xml and required to return a list of strings of plugin names it depends on, i.e
-{{{
-@staticmethod
-def depends(xml):
-  ...
-}}}
-When choosing between multiple plugins whos dependencies have been satisfied it will choose the first in the file. (And includes will handle this correctly.) Right now this feature is not used, but ultimately specifying the plugins in linear order is annoying, so plugins should start implementing this now so they are ready for when this is implemented. If this method is not defined it is assumed the plugin has no dependencies.
+The only hard requirement is that a plugin class has a constructor of the form {{{__init__(self,manager,xml)}}}. The manager gives the plugin manager object, the xml gives the obj element that declares the instance, as a {{{xml.etree Element}}} from the python standard library. This xml element has to have the name and type attributes of course, but anything extra, including sub-elements, can be interpreted at will by the plugin and used however it likes.
 
-A plugin can optionally declare a reload(self,manager,xml) method - on transition from one config file to another if the new config file contains a variable with the same type that has this method it will be called instead of deleting the old one and replacing it.
+A plugin can optionally declare a {{{reload(self,manager,xml)}}} method - on transition from one config file to another if the new config file contains a variable with the same type and name and the plugin has this method then it will be called instead of deleting the old plugin and replacing it. You can not assume that the xml will be the same, and should ideally support all possible changes (Of course, convention could be to write your config files to avoid transitions you haven't handled in code, but that is a bug waiting to happen.). This is what allows plugins to be recycled. This is very important for doing the half-life trick, where a new level loads without the continuity of the environment being broken.
 
-A plugin can optionally have a postInit generator and a postReload generator - in both cases called immediately after the __init__ or Reload methods. These should be used if a lot of work is happening to avoid blocking the frame rate.
+A plugin can optionally have a {{{postInit(self)}}} generator and a {{{postReload(self)}}} generator - in both cases called immediately after the {{{__init__}}} or {{{reload}}} methods. These should be used if a lot of work is happening to avoid blocking the frame rate - i.e. each time the generator yields a new frame will be rendered, and the loading screen plugin will have an opportunity to update.
 
+A plugin can also have the {{{start(self)}}} method - this will be called in creation order on all plugins at the end of a transition.
+A plugin can also have the {{{stop(self)}}} method - this will be called in reverse creation order on all plugins at the start of a transition.
+Note that a plugin should only render to screen or play sound when it has been started but not stopped - otherwise it will interfere with the loading screens. (Unless it is a loading screen, in which case it will do the reverse.) Unlike all other calls, where frames can be rendered between individual calls to maintain the loading screen, calling start and stop are effectively atomic operations - they are called for all plugins without delay. Consequentially they should be quick to return - typically they contain calls to {{{hide()}}} and {{{show()}}} to hide/show the plugins associated geometry.
 
-A plugin can also have the start(self) method - this will be called in creation order on all plugins at the end of a transition.
-A plugin can also have the stop(self) method - this will be called in reverse creation order on all plugins at the start of a transition.
-Note that a plugin should only render to screen or play sound when it has been started but not stopped - otherwise it will interfere with the loading screens. (unless it is a loading screen, in which case it will do the reverse.)
-
-Finally, there can be a 'destroy' method which is called after a stop when the plugin is defiantly not going to be reused.
-
-
-Transitions are what make this system worthwhile - at any point you can transition to a new config file - so one config file could be the menu, then another for each level, etc. When transitioning a loading screen will automatically be displayed.
-
-Additionally, an 'Include' plugin will be provided, that allows one config file to include another, so shared stuff does not have to be repeated. For instance each level might include a key binding config, a player setup config and a gui config, for instance, and then contain stuff that is only specific to the level.
-
-File order is important for dependencies, as plugins are initialised in the order they are found in the xml file. (Including calls to the reload method on a transition.)
+Finally, there can be a {{{destroy(self)}}} method which is called after a stop when the plugin is not going to be reused.
