@@ -1,0 +1,21 @@
+=Default Input=
+
+==Player Controls==
+  * mouse movement - looking around
+  * mouse lmb - shoot
+  * mouse rmb - hold down to look down gun - improves accuracy, at expense of movement speed.
+
+  * wasd - standard movement controls.
+  * space - jump
+  * control - crouch
+
+  * esc - Exit the game
+
+==Other Controls==
+
+  * f1 - toggle the in-game python console. Allows arbitrary python commands to be entered in real time. Has access to all plugins by name.
+  * f7 - toggles wireframe rendering.
+  * f9 - resets the players position, for when you fall out of the level!
+  * f10 - starts the profiler, including running the profiler executable. Note that the program won't fully close until the profiler is fully closed.
+  * f11 - take a screenshot.
+  * shift-f11 - toggle taking a screenshot every single frame. Allows for primitive video recording.
