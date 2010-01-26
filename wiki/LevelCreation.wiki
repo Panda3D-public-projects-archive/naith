@@ -1,0 +1,72 @@
+=Level Creation=
+==Overview==
+
+In principal level construction can be done using any modelling tool that can export eggs, however as this project is of an open source nature and one of the authors maintains Chicken (Blenders exporter), Blender is treated as the exclusive level editor. It should be possible to use other tools, though a fairly complete feature set is required of the exporter, so it is expected that Maya is the only other realistic option. (If you want to provide a level to this repository it better be Blender however - an open source project where you have to pay a small fortune to open its files would be absurd.)
+
+This document covers the methods associated with the current set of plugins - there is no reason it should remain the case using a different set of plugins. Plugins are a key consideration - whilst the Level plugin loads the level it is only responsible for geometry and collision detection - everything else in a level will be controlled by a plugin. As each plugin has its own conventions this can result in quite a lot of variability in how you setup certain behaviours in a level. Conventions exist however, and will be implicit throughout this document.
+
+A level consists of 3 things:
+  * Basic level geometry: The actual world geometry, but _without_ detail. Detail is added by prefabs, much as in any other level editor - prefabs are provided as entities. It should be noted that no rendering optimisation is made of the level geometry, hence it should be kept simple, and/or have a hierarchy applied to allow clipping parts of it.
+  * Collision geometry: This is often just a copy of the world geometry. However some changes are generally needed. For instance stairs work better if converted to ramps (Actually, for stairs its best to have ramps for both and then use prefabs for the actual steps.), and barriers might be needed to stop a player swimming out to sea forever. There also might be areas the player could never reach, which might as well be deleted.
+  * Entities: These are usually empties, though can be actual geometry, and are not rendered. Instead they are made available to the plugins which do what they will with them. For instance, they include the player start, the locations of prefabs to add detail, the locations of other objects, such as cans of spam, and the regions used by the portal system. A core convention exists - they are all tagged with a string tag with the name {{{IsA}}} and a key that indicates which plugin to use. For instance the starting point for the player is tagged with {{{IsA:PlayerStart}}}.
+
+Each of these three things exists as a separate .egg file loaded by the Level plugin. To see how other plugins interact with the Level plugin go look at the code of the included plugins and the levels that use them.
+
+Whilst the following sections give many details the best way to learn is to go and look at an actual level - {{{test}}} is the original and demonstrates most of it.
+
+
+==File Setup==
+
+The {{{test}}} level provided demonstrates a complete file setup. Being a very powerful and generic tool Blender has a certain amount of flexibility which can result in a mess if used without discipline. The most important trick is the use of layers to separate the various types of information. As demonstrated by the {{{cove}}} level a good layer setup is:
+  * Everything on layer 1 - this is where most editing is done.
+  * Visible geometry on level 2 - select all on this layer to export the geometry.egg file.
+  * Collision geometry on level 3 - select all on this layer to export the collision.egg file.
+  * Entities on level 4 - select all on this layer to export the things.egg file.
+
+Note that objects will all appear on at least two layers (Set using 'm' in blender.) - geometry shared between collisions and visibility can be on three layers. Without this exporting would prove onerous.
+
+
+==Level Geometry==
+
+Geometry is of course extremely important, but can basically be any polygon soup the player can walk around in. The convention in the game is for each blender/panda unit to be equivalent to 1 meter. (This is actually required by the physics system.) Normals must be the right way around for both visible and collision geometry.
+
+For visible geometry there are very few rules, except it should obviously match up with the collision geometry to avoid strangeness. Chopping the mesh into chunks, one for each area, can accelerate rendering time. As this geometry will be relatively simple texturing is its most important property. The baking of shadow maps helps a lot.
+
+Collision geometry should avoid being too messy, and should be of a relatively low resolution. Avoiding cracks is essential so collision geometry should either overlap or be fully stitched together. Note that ODE prefers for the polygons to of a similar scale to the object they are colliding with, so avoid any polygons that are an order of magnitude or more different in size from the player. (Stay in the range 0.5x to 5x to be absolutely safe.)
+
+
+==Entities==
+
+As already mentioned, entities are 'everything else' in a level. Most entities will ultimately be rendered as some geometry however, yet stored in Blender as an empty. This does not facilitate editing, so a trick is almost invariably used (See the {{{test}}} level.). Dupligroups allow an empty to be rendered in Blender as an arbitrary mesh; using linking this can even be stored in another file. By using this feature accurate positioning and a good visualisation can be obtained. There are two issues to consider however; firstly, Chicken automatically takes empties that use DupliGroup to be exported as instances, which is not desired in this case. Tagging the empty with {{{ForceEmpty}}} will resolve this. The second issue is that when linking an external file in the code tree you must use relative import, as otherwise it will break when someone else loads the repository in a different directory. Due to the mistake creating potential here it is wise to construct library files that are appended containing these objects already setup correctly. Entire libraries can be imported this way, and kept on an unused layer to kep them out of the way.
+
+One specific detail mentioned here, and a mistake made throughout the test level, is that physics objects should overlap very slightly when stacked etc. This is because all physics objects are initialised to be off - they don't come alive until the player interacts with them. If they don't intersect slightly it is possible for the player to remove things from the bottom of a stack without the objects above ever being activated, leaving the objects floating in mid-air. This looks silly.
+
+
+==Configuration File==
+
+Once you have the .egg files for a level you also need a configuration file - it is best to copy and customise a file that already exists. The most important part of this file will be
+{{{
+<obj type="Include" config="playable"/>
+
+<obj type="Level" name="level">
+  <render filename="..."/>
+  <collide filename="..."/>
+  <things filename="..."/>
+</obj>
+}}}
+The {{{Include}}} plugin pulls in all the stuff shared between levels whilst the {{{Level}}} plugin loads the actual level. You will then need plugins to translate the various entities in the level - level specific once might be included in the levels .xml file, but most will come from include files that contain collections used over multiple levels. Additional plugins might be required for special level features, such as sky boxes, water etc.
+
+
+==Portals==
+
+Right now rendering optimisation is minimal. There is a portal system implemented however via the plugin {{{CullAABB}}}. This chunks the level into axis aligned boxes with portals between them. It then determines which region the player is in and only renders what the player could see from that viewpoint. At this point only the {{{StaticObject}}} plugin creates visible geometry that is culled by this system, but as that plugin drives all prefabs that should actually be the majority of geometry in a real level.
+
+To set this up you need the plugin in your levels configuration,
+{{{
+<obj type="CullAABB" name="cull">
+  <level plugin="level"/>
+</obj>
+}}}
+and the entire level covered by axis aligned cubes that have been tagged with IsA:CullAABB. The portal construction method requires that the corners of these boxes never intersect - i.e. if two boxes have a connecting portal then one face of one of the regions must be entirely within the other regions bounding volume. The {{{test}}} level demonstrates this. These bounding boxes should be on the entities layer, it is also convenient to switch them to wireframe rendering.
+
+This is quite a primitive system - a more sophisticated system can be developed if needed however.
