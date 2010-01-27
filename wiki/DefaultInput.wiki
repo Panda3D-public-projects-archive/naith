@@ -19,3 +19,4 @@
   * f10 - starts the profiler, including running the profiler executable. Note that the program won't fully close until the profiler is fully closed.
   * f11 - take a screenshot.
   * shift-f11 - toggle taking a screenshot every single frame. Allows for primitive video recording.
+  * f12 - toggle the framerate being visible.
