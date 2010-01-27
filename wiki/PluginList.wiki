@@ -1,0 +1,33 @@
+=Plugin List=
+
+  * _AmbLight_: Global ambient light,
+  * _BulletHoles_: Draws bullet holes - a plugin used by the weapon class. Support bullet holes that move with the object they have impacted with.
+  * _Camera_: Tracks a node with the camera - the plugin will typically be setup to track the player objects head. Support zooming behaviour, for looking down the gun.
+  * _Clouds_: Creates clouds using clusters of sprites to obtain a volumetric effect. Incomplete.
+  * _CullAABB_: Culls invisible geometry by chopping the level into axis aligned bounding boxes with portals at the intersections of the regions.
+  * _DeveloperConsole_: Provides the ability to enter arbitrary python commands and run them within the game engine at runtime. Provides convenient access to all named plugins.
+  * _DirLight_: Global directional light. Has shadow casting support.
+  * _EscExit_: Makes the escape button fully exit the game.
+  * _Filters_: Sets up filters on the scene - this covers HDR and bloom. also controls if the autoShader is on for the root of the scene.
+  * _FrameRate_: Sets up f12 to toggle the frame rate being visible or not.
+  * _Global_: Provides access to its xml for all other plugins. Primarily used to configure where data to got from.
+  * _Include_: Includes other configuration files within the current one. Dumb, so never double include.
+  * _InitODE_: Sets up ODE and provides various helpers for all its users; does the actual simulation/collision work.
+  * _KeysFPS_: Sets up FPS style key controls, which are then linked to the Player adn Weapon plugins.
+  * _Level_: Loads a level, renders the basic geometry, registers its collision mesh and exposes the rest to all the other plugins.
+  * _Loading_: Creates a primitive loading screen during transitions.
+  * _MethodOnKey_: Allows you to list a number of key events, which are then translated to method calls on arbitrary plugins.
+  * _MouseFPS_: Handles the mouse in a way suitable for a FPS, interacts with the Player plugin.
+  * _ParticleManager_: Manages particle systems, provides an easy interface for creating fx.
+  * _PhysicsObject_: An object that is controlled by the physics system, so it can be shot or bumped into by the player, or indeed other physics objects that are already in motion.
+  * _Player_: The player object - controls the players physics, behaviour and general interaction with the world. Rather messy and could do with being recreated.
+  * _PointLight_: Global point light.
+  * _Profile_: Provides easy access to pandas profiler - will connect to a copy of pstats running on the local computer. If a copy is not already running it will spawn a copy.
+  * _QuickMenu_: Very simple menu - just a list of transitions to perform on clicking the various buttons.
+  * _SimpleWeapon_: Controls a weapon - manages shooting, wiggle, looking down the gun etc. Uses the bullet hole and particle plugins to make things pretty.
+  * _Sky_: A sky box.
+  * _SpotLight_: Global spotlight.
+  * _StaticObject_: Creates a static object - just geometry and collision, but no physics simulation. Will make use of the portal system if available.
+  * _Sun_: Renders a sphere, to represent the sun; also sets up a god rays filter.
+  * _Water_: Renders water in the z=0 plane.
+  * _Window_: Creates the window; controls some setting and also handles screenshots.
