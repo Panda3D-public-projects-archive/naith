@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright Tom SF Haines
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,7 +36,7 @@ def firstLight(task):
   if len(sys.argv)>1:
     cn = sys.argv[1]
   else:
-    cn = 'cove'
+    cn = 'start'
   
   print 'Starting configuration', cn
   plugin.transition(cn)

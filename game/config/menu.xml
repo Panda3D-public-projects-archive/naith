@@ -2,8 +2,8 @@
   <obj type="Include" config="base"/>
 
   <obj type="QuickMenu" name="menu">
-    <button text="Gameplay test" target="test"/>
-    <button text="Graphics test" target="cove-normal"/>
-    <button text="Graphics test (LQ)" target="cove"/>
+    <button text="Original Level" target="test"/>
+    <button text="Cove Level" target="cove-normal"/>
+    <button text="Cove Level (No postprocessing)" target="cove"/>
   </obj>
 </config>

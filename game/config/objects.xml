@@ -5,7 +5,25 @@
     <physics type="mesh" surface="sheet_metal" filename="pedestal/pedestal"/>
     <cull plugin="cull"/>
   </obj>
-  
+
+  <obj type="StaticObject" name="tree">
+    <isa source="level" name="PalmTree"/>
+    <mesh filename="trees/palmtree1"/>
+  </obj>
+
+  <obj type="StaticObject" name="static_plank">
+    <isa source="level" name="StaticPlank"/>
+    <mesh filename="plank/plank"/>
+    <physics type="box" lx="2.0" ly="0.4" lz="0.02" surface="rock"/>
+  </obj>
+
+  <obj type="PhysicsObject" name="plank">
+    <isa source="level" name="Plank"/>
+    <mesh filename="plank/plank"/>
+    <physics type="box" lx="2.0" ly="0.4" lz="0.02" mass="0.6" surface="rock"/>
+    <damping linear="0.15" angular="0.001"/>
+  </obj>
+
   <obj type="PhysicsObject" name="spam">
     <isa source="level" name="Spam"/>
     <mesh filename="spam/spam"/>

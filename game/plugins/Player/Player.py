@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright Tom SF Haines
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -150,7 +151,6 @@ class Player:
     self.standCheck.setCategoryBits(BitMask32(0xFFFFFFFE))
     self.standCheck.setCollideBits(BitMask32(0xFFFFFFFE))
     
-
     # We also need to store when a jump has been requested...
     self.doJump = False
     self.midJump = False

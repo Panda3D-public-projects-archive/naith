@@ -1,19 +1,17 @@
 <config>
   <obj type="Include" config="playable"/>
+
   <obj type="Level" name="level">
     <render filename="cove/cove"/>
     <collide filename="cove/cove-collide"/>
     <things filename="cove/cove-things"/>
   </obj>
 
+  <obj type="Include" config="objects"/>
+
   <obj type="StaticObject" name="floor">
     <physics type="plane" surface="default"/>
     <instance z="-1"/>
-  </obj>
-
-  <obj type="StaticObject" name="tree">
-    <isa source="level" name="PalmTree"/>
-    <mesh filename="trees/palmtree1"/>
   </obj>
 
   <obj type="PhysicsObject" name="boulder">
