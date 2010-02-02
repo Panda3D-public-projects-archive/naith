@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright Tom SF Haines
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +25,7 @@ class MouseFPS:
   """Provides fps style mouse control, sending the data to arbitary nodes"""
   def __init__(self,manager,xml):
     self.reset = False
+    self.task = None
     
     self.reload(manager,xml)
 
@@ -74,8 +76,9 @@ class MouseFPS:
     base.win.requestProperties(props)
 
     # Stop the mouse task...
-    taskMgr.remove(self.task)
-    self.task = None
+    if self.task!=None:
+      taskMgr.remove(self.task)
+      self.task = None
 
 
   def mouseTask(self,task):

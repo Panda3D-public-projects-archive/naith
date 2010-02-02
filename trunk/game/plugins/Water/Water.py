@@ -71,6 +71,7 @@ class Water:
     self.surface.setShaderInput('deepcolor', Vec4(0.0,0.3,0.5,1.0))
     self.surface.setShaderInput('shallowcolor', Vec4(0.0,1.0,1.0,1.0))
     self.surface.setShaderInput('reflectioncolor', Vec4(0.95,1.0,1.0,1.0))
+    self.surface.hide()
 
     self.wbuffer = base.win.makeTextureBuffer('water', 512, 512)
     self.wbuffer.setClearColorActive(True)
@@ -81,8 +82,8 @@ class Water:
       self.sky.setTwoSided(True)
       self.sky.setSz(self.sky, -1)
       self.sky.setClipPlaneOff(1)
+      self.sky.show()
       self.sky.hide(BitMask32.bit(0)) # Hide for normal camera
-      self.sky.show(BitMask32.bit(1)) # Show for reflection camera
       self.sky.hide(BitMask32.bit(2)) # Hide for volumetric lighting camera
       self.sky.hide(BitMask32.bit(3)) # Hide for shadow camera(s), if any
     else:
@@ -107,9 +108,13 @@ class Water:
     #self.fog.setColor(0.0,0.3,0.5)
     self.fogEnabled = False
 
-    self.updateTask = taskMgr.add(self.update, 'water-update')
 
+  def start(self):
+    self.updateTask = taskMgr.add(self.update, 'water-update')
+    self.surface.show()
+    
   def stop(self):
+    self.surface.hide()
     taskMgr.remove(self.updateTask)
 
   def update(self, task):

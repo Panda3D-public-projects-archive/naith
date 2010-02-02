@@ -6,7 +6,10 @@
     <collide filename="cove/cove-collide"/>
     <things filename="cove/cove-things"/>
   </obj>
-
+  <obj type="MethodOnKey" name="levelVisible">
+    <action key="f8" plugin="level" method="toggleVisible"/>
+  </obj>
+  
   <obj type="Include" config="objects"/>
 
   <obj type="StaticObject" name="floor">
@@ -35,7 +38,19 @@
 
   <obj type="DirLight" name="sunlight">
     <color r="4.0" g="3.2" b="1.0"/>
-    <lookAt x="0.647" y="0.740" z="-1"/>
+    <lookAt x="0.0" y="0.0" z="0.0"/>
+    <pos x="273.8" y="-45.4" z="60.4"/>
     <lens near="-30" far="10" width="27" height="18" x="21" y="0" auto="0"/>
+  </obj>
+  <obj type="DirLight" name="water_tint">
+    <color r="0.1" g="0.1" b="0.5"/>
+    <pos x="0.0" y="-40.0" z="-10.0"/>
+    <lookAt x="0.0" y="0.0" z="0.0"/>
+  </obj>
+
+  <obj type="Filters" config="filters">
+    <hdr type="1"/>
+    <perpixel/>
+    <bloom size="medium"/>
   </obj>
 </config>

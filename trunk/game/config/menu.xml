@@ -4,6 +4,6 @@
   <obj type="QuickMenu" name="menu">
     <button text="Original Level" target="test"/>
     <button text="Cove Level" target="cove-normal"/>
-    <button text="Cove Level (No postprocessing)" target="cove"/>
+    <button text="Cove Level (No sun)" target="cove"/>
   </obj>
 </config>

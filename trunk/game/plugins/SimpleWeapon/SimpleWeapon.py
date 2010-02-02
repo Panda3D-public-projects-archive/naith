@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright Tom SF Haines
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -115,9 +116,7 @@ class SimpleWeapon:
 
   def postReload(self):
     # Load the actor...
-    self.mesh = Actor()
-    yield
-    self.mesh.loadModel(self.meshPath)
+    self.mesh = Actor(self.meshPath)
     yield
 
     # Shader generator makes it shiny, plus we need it in the right places in the render graph...

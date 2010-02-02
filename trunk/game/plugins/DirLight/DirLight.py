@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright Tom SF Haines, Aaron Snoswell
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,7 +59,7 @@ class DirLight:
       shadows = xml.find('shadows')
       if shadows!=None:
         self.lightNode.node().setShadowCaster(True, int(shadows.get('width', 512)), int(shadows.get('height', 512)), int(shadows.get('sort', -10)))
-        self.lightNode.node().setPushBias(float(shadows.get('bias', 0.5)))
+        #self.lightNode.node().setPushBias(float(shadows.get('bias', 0.5)))
       else:
         self.lightNode.node().setShadowCaster(False)
 
