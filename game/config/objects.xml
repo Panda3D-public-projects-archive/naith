@@ -20,7 +20,7 @@
   <obj type="PhysicsObject" name="plank">
     <isa source="level" name="Plank"/>
     <mesh filename="plank/plank"/>
-    <physics type="box" lx="2.0" ly="0.4" lz="0.02" mass="0.6" surface="rock"/>
+    <physics type="box" lx="2.0" ly="0.4" lz="0.02" mass="2.0" surface="rock"/>
     <damping linear="0.15" angular="0.001"/>
   </obj>
 

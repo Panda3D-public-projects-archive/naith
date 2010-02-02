@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright Reinier de Blois
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +22,9 @@ class Sky:
     # Set the background color first
     background = xml.find("background")
     if background != None:
-      base.setBackgroundColor(Vec4(float(background.get('r')), float(background.get('g')), float(background.get('b')), 1))
+      self.bgColour = Vec4(float(background.get('r')), float(background.get('g')), float(background.get('b')), 1)
+    else:
+      self.bgColour = None
 
     # Get the path to load skies from...
     basePath = manager.get('paths').getConfig().find('skies').get('path')
@@ -40,7 +43,17 @@ class Sky:
       self.model.setTexture(loader.loadTexture(os.path.join(basePath, skydome.get('filename'))))
       self.model.setTag('sun', 'True')
       self.model.reparentTo(base.cam)
+      self.model.hide()
+
+  def start(self):
+    if self.bgColour!=None: base.setBackgroundColor(self.bgColour)
+
+    if self.model!=None:
+      self.model.show()
       self.model.hide(BitMask32.bit(1)) # Hide from the reflection camera
       self.model.hide(BitMask32.bit(2)) # Hide from the volumetric lighting camera
       self.model.hide(BitMask32.bit(3)) # Hide from the shadow camera(s), if any
 
+  def stop(self):
+    if self.model!=None:
+      self.model.hide()

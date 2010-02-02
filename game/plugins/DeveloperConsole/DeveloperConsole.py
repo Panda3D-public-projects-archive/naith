@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright Reinier de Blois
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +20,8 @@ from direct.gui.OnscreenText import OnscreenText
 import sys, traceback
 import __main__
 from code import InteractiveInterpreter
+
+import panda3d
 
 TEXT_MARGIN = (0.03, -0.06)
 
@@ -111,6 +114,7 @@ class DeveloperConsole(InteractiveInterpreter, DirectObject):
       locals['manager'] = self.manager
       for plugin in self.manager.named.keys():
         locals[plugin] = self.manager.named[plugin]
+      locals['panda3d'] = panda3d
       
       # Run it and print the output.
       if not self.initialized:
