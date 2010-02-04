@@ -60,6 +60,7 @@
 
   <obj type="MethodOnKey" name="assortedKeys">
     <action key="f1" plugin="console" method="toggle"/>
+    <action key="f4" plugin="window" method="toggleFullscreen"/>
     <action key="f7" plugin="window" method="wireframe"/>
     <action key="f9" plugin="player" method="reset"/>
     <action key="f10" plugin="profile" method="go"/>
