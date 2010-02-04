@@ -29,13 +29,38 @@ class Window:
 
     self.task = None
 
+    # Get supported resolutions...
+    info = base.pipe.getDisplayInformation()
+    self.res = []
+    for i in xrange(info.getTotalDisplayModes()):
+      self.res.append((info.getDisplayModeWidth(i),info.getDisplayModeHeight(i)))
+
   def reload(self,manager,xml):
     pass
 
   screenshot = lambda self: base.screenshot()
   wireframe  = lambda self: base.toggleWireframe()
 
-
+  def toggleFullscreen(self):
+    prop = base.win.getProperties()
+    newProp = WindowProperties()
+    
+    if not prop.getFullscreen():
+      newProp.setFullscreen(True)
+      # Quick hack to get it to select a suitable display mode.
+      if (1680,1050) in self.res:
+        newProp.setSize(1680,1050)
+      elif (1280,768) in self.res:
+        newProp.setSize(1280,768)
+      elif (1024,768) in self.res:
+        newProp.setSize(1024,768)
+      else:
+        newProp.setSize(800,600)
+    else:
+      newProp.setFullscreen(False)
+    
+    base.win.requestProperties(newProp)
+  
   def record(self,task):
     base.screenshot(defaultFilename=False,namePrefix=('video|%s|%04i.jpg'%(self.video,self.frameNum)))
     self.frameNum += 1
