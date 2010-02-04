@@ -14,6 +14,7 @@
 ==Other Controls==
 
   * f1 - toggle the in-game python console. Allows arbitrary python commands to be entered in real time. Has access to all plugins by name.
+  * f4 - toggle fullscreen.
   * f7 - toggles wireframe rendering.
   * f9 - resets the players position, for when you fall out of the level!
   * f10 - starts the profiler, including running the profiler executable. Note that the program won't fully close until the profiler is fully closed.
