@@ -26,14 +26,14 @@ void fshader(float2 l_texcoord0 : TEXCOORD0,
   lightdir *= k_vlparams.y;
   half3 sample = tex2D(k_src, curcoord);
   float3 vlcolor = sample;
-  for (int i = 0; i < k_vlparams.x; i++) {
+  for (int i = 0; i < 32; i++) {
     curcoord -= lightdir;
     sample = tex2D(k_src, curcoord);
     sample *= decay;
     vlcolor += sample;
     decay *= k_vlparams.z;
   }
-  o_color.rgb = min(vlcolor * k_vlcolor.www * k_vlcolor.rgb, k_vlparams.www) * 2.0f;
+  o_color.rgb = min(vlcolor * k_vlcolor.www * k_vlcolor.rgb, k_vlparams.www) * 2.0;
   o_color.a = 0.0f;
 }
 

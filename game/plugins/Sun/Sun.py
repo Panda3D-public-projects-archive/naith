@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright Reinier de Blois
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,10 +22,10 @@ class Sun:
     self.updateTask = None
 
     self.sun = base.cam.attachNewNode('sun')
-    loader.loadModel("models/misc/sphere").reparentTo(self.sun)
+    loader.loadModel("data/misc/sphere").reparentTo(self.sun)
     self.sun.setScale(0.1)
     self.sun.setTwoSided(True)
-    self.sun.setColorScale(1, 1, 1, 1, 10001)
+    self.sun.setColorScale(10.0, 10.0, 10.0, 1.0, 10001)
     self.sun.setLightOff(1)
     self.sun.setShaderOff(1)
     self.sun.setFogOff(1)
@@ -69,15 +70,21 @@ class Sun:
       self.finalQuad.setAttrib(ColorBlendAttrib.make(ColorBlendAttrib.MAdd, ColorBlendAttrib.OIncomingColor, ColorBlendAttrib.OFbufferColor))
       self.finalQuad.setShader(Shader.load(os.path.join(manager.get('paths').getConfig().find('shaders').get('path'), 'filter-vlight.cg')))
       self.finalQuad.setShaderInput('src', self.vltexture)
-      self.finalQuad.setShaderInput('vlparams', 32, 0.9/32.0, 0.97, 0.5)
+      self.finalQuad.setShaderInput('vlparams', 32, 0.9/32.0, 0.97, 0.5) # Note - first 32 is now hardcoded into shader for cards that don't support variable sized loops.
       self.finalQuad.setShaderInput('casterpos', 0.5, 0.5, 0, 0)
       # Last parameter to vlcolor is the exposure
-      vlcolor = Vec4(float(godrays.get('r', '1')), float(godrays.get('g', '1')), float(godrays.get('b', '1')), 0.05)
+      vlcolor = Vec4(float(godrays.get('r', '1')), float(godrays.get('g', '1')), float(godrays.get('b', '1')), 0.04)
       self.finalQuad.setShaderInput('vlcolor', vlcolor)
-      self.updateTask = taskMgr.add(self.update, 'sky-update')
+    else:
+      self.finalQuad = None
 
+  def start(self):
+    if self.finalQuad!=None:
+      self.updateTask = taskMgr.add(self.update, 'sky-update')
+    
   def stop(self):
-    taskMgr.remove(self.updateTask)
+    if self.updateTask!=None:
+      taskMgr.remove(self.updateTask)
 
   def update(self, task):
     casterpos = Point2()
