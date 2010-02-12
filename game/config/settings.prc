@@ -16,7 +16,6 @@ multisamples 1
 
 # Portal support so we can clip large chunks of geometry...
 allow-portal-cull 1
-show-portal-debug 0
 
 
 # Sound off as there are issues right now...

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright Tom SF Haines
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,10 +26,11 @@ import direct.directbase.DirectStart
 class Manager:
   """The simple plugin system - this is documented in the docs directory."""
   
-  def __init__(self):
+  def __init__(self,baseDir = ''):
     # Basic configuratrion variables...
-    self.pluginDir = 'plugins/'
-    self.configDir = 'config/'
+    self.baseDir = baseDir
+    self.pluginDir = self.baseDir+'plugins/'
+    self.configDir = self.baseDir+'config/'
     self.loadingInvFrameRate = 1.0/20.0
     
     # The plugin database - dictionary of modules...
@@ -144,14 +146,12 @@ class Manager:
     # Step 2 - get the plugin - load it if it is not already loaded...
     if not self.plugin.has_key(plugin):
       print 'Loading plugin', plugin
-      fp, path, desc = imp.find_module(plugin,[self.pluginDir+plugin+'/'])
-      try:
-        sys.path.append(self.pluginDir+plugin+'/')
-        self.plugin[plugin] = imp.load_module(plugin,fp,path,desc)
-        del sys.path[-1]
-      finally:
-        if fp:
-          fp.close()
+      path = self.pluginDir+plugin.lower()+'/'+plugin.lower()+'.py'
+      
+      sys.path.append(self.pluginDir+plugin.lower()+'/')
+      self.plugin[plugin] = imp.load_source(plugin,path)
+      del sys.path[-1]
+      
       print 'Loaded', plugin
       yield None
 
