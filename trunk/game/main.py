@@ -23,6 +23,7 @@ from pandac.PandaModules import loadPrcFile, loadPrcFileData
 loadPrcFile("config/settings.prc")
 loadPrcFileData("window-disable", "window-type none")
 import direct.directbase.DirectStart
+import direct.stdpy.file as pfile
 from direct.task import Task
 
 from bin.manager import *
@@ -31,15 +32,24 @@ import sys
 
 #messenger.toggleVerbose()
 
-plugin = Manager()
+# Detect if we are in a multifile and, if so, jump through hoops that shouldn't exist...
+if base.appRunner!=None:
+  print 'In multifile, root = '+base.appRunner.multifileRoot
+  baseDir = base.appRunner.multifileRoot+'/'
+else:
+  baseDir = ''
 
+# Create the manager - this does it all...
+plugin = Manager(baseDir)
+
+# Create a task to do the work of getting the game going...
 def firstLight(task):
   if len(sys.argv)>1:
     cn = sys.argv[1]
   else:
     cn = 'menu'
   
-  print 'Starting configuration', cn
+  print 'Starting configuration ' + cn
   plugin.transition(cn)
   return Task.done
 
