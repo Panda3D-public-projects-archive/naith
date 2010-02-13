@@ -19,8 +19,8 @@ import os.path
 import random
 import math
 
-import ray_cast
-import csp
+from bin.shared import ray_cast
+from bin.shared import csp
 
 from direct.actor.Actor import Actor
 from direct.interval.IntervalGlobal import *

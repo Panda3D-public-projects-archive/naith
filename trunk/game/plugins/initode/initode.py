@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright Tom SF Haines
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -70,6 +71,7 @@ class InitODE(DirectObject.DirectObject):
     # Create the synch database - this is a database of NodePath and ODEBodys - each frame the NodePaths have their positions synched with the ODEBodys...
     self.synch = dict() # dict of tuples (node,body), indexed by an integer that is written to the NodePath as a integer using setPythonTag into 'ode_key'
     self.nextKey = 0
+    self.nextDampKey = 0
 
     # Create the extra function databases - pre- and post- functions for before and after each collision step...
     self.preCollide = dict() # id(func) -> func
@@ -103,11 +105,18 @@ class InitODE(DirectObject.DirectObject):
       for key,data in self.damping.iteritems():
         if data[0].isEnabled():
           vel = data[0].getLinearVel()
-          vel *= -data[1]
-          data[0].addForce(vel)
+          if vel.length()>1e3: # Cap dangerous motion.
+            data[0].setLinearVel(vel*(1e3/vel.length()))
+          else:
+            vel *= -data[1]
+            data[0].addForce(vel)
+
           rot = data[0].getAngularVel()
-          rot *= -data[2]
-          data[0].addTorque(rot)
+          if rot.length()>1e3: # Cap dangerous rotation.
+            data[0].setAngularVel(rot*(1e3/rot.length()))
+          else:
+            rot *= -data[2]
+            data[0].addTorque(rot)
 
       # A single step of collision detection...
       self.space.autoCollide() # Setup the contact joints
@@ -175,21 +184,14 @@ class InitODE(DirectObject.DirectObject):
 
   def regBodySynch(self,node,body):
     """Given a NodePath and a Body this arranges that the NodePath tracks the Body."""
-    if node.hasTag('ode_key'):
-      key = node.getTag('ode_key')
-    else:
-      key = self.nextKey
-      self.nextKey += 1
-      node.setPythonTag('ode_key',key)
-
-    self.synch[key] = (node,body)
+    body.setData(node)
+    self.synch[node.getKey()] = (node,body)
 
   def unregBodySynch(self,node):
     """Removes a NodePath/Body pair from the synchronisation database, so the NodePath will stop automatically tracking the Body."""
-    if node.hasTag('ode_key'):
-      key = node.getTag('ode_key')
-      if self.synch.has_key(key):
-        del self.synch[key]
+    if self.synch.has_key(node.getKey()):
+      self.synch[node.getKey()][1].setData(None)
+      del self.synch[node.getKey()]
 
   def regPreFunc(self,name,func):
     """Registers a function under a unique name to be called before every step of the physics simulation - this is different from every frame, being entirly regular."""
@@ -220,10 +222,10 @@ class InitODE(DirectObject.DirectObject):
 
   def regDamping(self,body,linear,angular):
     """Given a body this applies a damping force, such that the velocity and rotation will be reduced in time. If the body is already registered this will update the current setting."""
-    self.damping[str(body)] = (body,linear,angular)
+    self.damping[body.getData().getKey()] = (body,linear,angular)
 
   def unregDampingl(self,body):
     """Unregisters a body from damping."""
-    key = str(body)
+    key = body.getId()
     if self.damping.has_key(key):
       del self.air_resist[key]
