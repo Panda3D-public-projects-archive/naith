@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright Tom SF Haines
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,15 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os.path
+
 
 
 class Global:
   """This provides global access to lumps of configuration xml - allows other plugin objects to get at the xml it is given."""
   def __init__(self,manager,xml):
-    self.xml = xml
+    self.reload(manager,xml)
 
   def reload(self,manager,xml):
     self.xml = xml
+
+    # Some clever code for handling being in a p3d file - turn paths into full paths if needed...
+    if base.appRunner!=None:
+      for elem in self.xml:
+        if elem.attrib.has_key('path'):
+          elem.attrib['path'] = os.path.join(base.appRunner.multifileRoot,elem.attrib['path'])
 
   def getConfig(self):
     return self.xml

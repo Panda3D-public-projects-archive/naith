@@ -22,7 +22,7 @@ class Sun:
     self.updateTask = None
 
     self.sun = base.cam.attachNewNode('sun')
-    loader.loadModel("data/misc/sphere").reparentTo(self.sun)
+    loader.loadModel(manager.get('paths').getConfig().find('misc').get('path')+'/sphere').reparentTo(self.sun)
     self.sun.setScale(0.1)
     self.sun.setTwoSided(True)
     self.sun.setColorScale(10.0, 10.0, 10.0, 1.0, 10001)

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright Tom SF Haines
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -139,13 +140,13 @@ class PhysicsObject:
       if damp!=None:
         self.ode.regDamping(body,float(damp.get('linear')),float(damp.get('angular')))
 
-      # Tie everything together, arrange for damping...
+      # Tie everything together...
       self.ode.regBodySynch(model,body)
       self.things.append((model,body,col))
 
       yield
 
-
+    
   def start(self):
     self.node.show()
 

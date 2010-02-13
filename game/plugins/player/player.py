@@ -20,7 +20,7 @@ import random
 
 from pandac.PandaModules import *
 
-import ray_cast
+from bin.shared import ray_cast
 
 
 class Player:

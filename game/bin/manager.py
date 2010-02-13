@@ -29,15 +29,12 @@ class Manager:
   def __init__(self,baseDir = ''):
     # Basic configuratrion variables...
     self.baseDir = baseDir
-    self.pluginDir = self.baseDir+'plugins/'
+    self.pluginDir = 'plugins'
     self.configDir = self.baseDir+'config/'
     self.loadingInvFrameRate = 1.0/20.0
     
     # The plugin database - dictionary of modules...
     self.plugin = dict()
-
-    # Add 'shared' to the path so shared code can be loaded by the various plugins...
-    sys.path.append('bin/shared')
     
     
     # Create the instance database - a list in creation order of (obj,name) where name can be None for nameless objects, plus a dictionary to get at the objects by name...
@@ -146,12 +143,10 @@ class Manager:
     # Step 2 - get the plugin - load it if it is not already loaded...
     if not self.plugin.has_key(plugin):
       print 'Loading plugin', plugin
-      path = self.pluginDir+plugin.lower()+'/'+plugin.lower()+'.py'
-      
-      sys.path.append(self.pluginDir+plugin.lower()+'/')
-      self.plugin[plugin] = imp.load_source(plugin,path)
-      del sys.path[-1]
-      
+      base = self.pluginDir + '.' + plugin.lower()
+      plug = __import__(base, globals(), locals(),[plugin.lower()])
+      plug = getattr(plug,plugin.lower())
+      self.plugin[plugin] = plug
       print 'Loaded', plugin
       yield None
 

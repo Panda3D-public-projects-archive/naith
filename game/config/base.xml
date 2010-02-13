@@ -14,7 +14,10 @@
     <objects path="data/objects"/>
     <particles path="data/particles"/>
     <shaders path="data/shaders"/>
+    <textures path="data/textures"/>
     <skies path="data/skies"/>
     <clouds path="data/clouds"/>
+    <misc path="data/misc"/>
+    <cache path="cache" temp="True"/>
   </obj>
 </config>

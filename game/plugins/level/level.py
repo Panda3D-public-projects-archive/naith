@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright Tom SF Haines
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +21,7 @@ import time
 from pandac.PandaModules import *
 import direct.directbase.DirectStart
 
-import odeSpaceHier
+from bin.shared import odeSpaceHier
 
 
 class Level:

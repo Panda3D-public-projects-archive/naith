@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright Reinier de Blois
+# Copyright Reinier de Blois, Tom SF Haines
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,48 +14,61 @@
 # limitations under the License.
 
 __all__ = ["Water"]
+
 import os
 from pandac.PandaModules import HeightfieldTesselator, PNMImage, Filename
 from pandac.PandaModules import BitMask32, TransparencyAttrib, Texture
 from pandac.PandaModules import RenderState, CullFaceAttrib, Fog
 from pandac.PandaModules import Plane, PlaneNode, Vec4, Vec3, Point3, NodePath
 
-POLYCOUNT = 50000
-SIZE = (512, 512)
-CACHEDFILE = "cache/plane-%dx%d-%dk.bam" % (SIZE[0], SIZE[1], int(POLYCOUNT / 1000))
 
-def generateWaterSurface():
-  if not os.path.isdir("cache"):
-    os.mkdir("cache")
-  img = PNMImage(*SIZE)
+
+def getWaterSurface(manager, polycount = 50000, size = (512,512)):
+  # Get cache directory...
+  cacheDir = manager.get('paths').getConfig().find('cache').get('path')
+
+  # Check if the data required already exists...
+  cachedWaterSurface = "%s/plane-%dx%d-%dk.bam" % (cacheDir, size[0], size[1], int(polycount/1000))
+  try:
+    return loader.loadModel(cachedWaterSurface)
+  except:
+    pass
+
+  # Make cache directory if needed...
+  if not os.path.isdir(cacheDir):
+    os.mkdir(cacheDir)
+
+  # Put in an image...
+  img = PNMImage(*size)
   img.makeGrayscale()
   img.fill(0, 0, 0)
-  img.write("cache/black-%dx%d.png" % SIZE)
+  img.write("%s/black-%dx%d.png" % (cacheDir,size[0],size[1]))
+
+  # Put in a mesh...
   ht = HeightfieldTesselator("plane")
-  assert ht.setHeightfield(Filename("cache/black-%dx%d.png" % SIZE))
-  ht.setPolyCount(POLYCOUNT)
-  ht.setFocalPoint(SIZE[0] * 0.5, SIZE[1] * 0.5)
+  assert ht.setHeightfield(Filename("%s/black-%dx%d.png" % (cacheDir,size[0],size[1])))
+  ht.setPolyCount(polycount)
+  ht.setFocalPoint(size[0] * 0.5, size[1] * 0.5)
   node = ht.generate()
-  node.setPos(-0.5 * SIZE[0], 0.5 * SIZE[1], 0)
+  node.setPos(-0.5 * size[0], 0.5 * size[1], 0)
   node.flattenLight()
-  node.writeBamFile(CACHEDFILE)
+  node.writeBamFile(cachedWaterSurface)
+  
   return node
+
+
 
 class Water:
   """Represents a water surface"""
   def __init__(self,manager,xml):
-    # If we don't have it, generate the water surface.
-    if os.path.isfile(CACHEDFILE):
-      self.surface = loader.loadModel(CACHEDFILE)
-    else:
-      self.surface = generateWaterSurface()
+    self.surface = getWaterSurface(manager)
     self.surface.reparentTo(render)
     self.surface.hide(BitMask32.bit(1)) # Invisible to reflection camera (speedup)
     self.surface.hide(BitMask32.bit(2)) # Invisible to volumetric lighting camera (speedup)
     self.surface.hide(BitMask32.bit(3)) # Invisible to shadow cameras (speedup)
-    self.surface.setShader(loader.loadShader('data/shaders/water.cg'))
+    self.surface.setShader(loader.loadShader(manager.get('paths').getConfig().find('shaders').get('path')+'/water.cg'))
     self.surface.setShaderInput('time', 0.0, 0.0, 0.0, 0.0)
-    ntex = loader.loadTexture('data/textures/water-normal.png')
+    ntex = loader.loadTexture(manager.get('paths').getConfig().find('textures').get('path')+'/water-normal.png')
     ntex.setMinfilter(Texture.FTLinearMipmapLinear)
     self.surface.setShaderInput('normal', ntex)
     self.surface.setShaderInput('camera', base.cam)
