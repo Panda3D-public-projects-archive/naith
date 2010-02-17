@@ -15,7 +15,7 @@
 
 
 
-import os.path
+import posixpath
 import time
 
 from pandac.PandaModules import *
@@ -38,7 +38,7 @@ class Level:
     # Get the details for the renderable geometry...
     rendElem = xml.find('render')
     if rendElem!=None:
-      self.rendPath = os.path.join(basePath,rendElem.get('filename'))
+      self.rendPath = posixpath.join(basePath,rendElem.get('filename'))
       self.rendAmb = xml.find('ambient')!=None
     else:
       self.rendPath = None
@@ -46,7 +46,7 @@ class Level:
     # Get the details for the collision geometry...
     colElem = xml.find('collide')
     if colElem!=None:
-      self.colPath = os.path.join(basePath,colElem.get('filename'))
+      self.colPath = posixpath.join(basePath,colElem.get('filename'))
       self.colSurface = colElem.get('surface','default')
     else:
       self.colPath = None
@@ -54,7 +54,7 @@ class Level:
     # Get the details for the instancing information - the things...
     thingElem = xml.find('things')
     if thingElem!=None:
-      self.thingPath = os.path.join(basePath,thingElem.get('filename'))
+      self.thingPath = posixpath.join(basePath,thingElem.get('filename'))
     else:
       self.thingPath = None
 

@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os.path
+import posixpath
 
 
 
@@ -29,7 +29,7 @@ class Global:
     if base.appRunner!=None:
       for elem in self.xml:
         if elem.attrib.has_key('path'):
-          elem.attrib['path'] = os.path.join(base.appRunner.multifileRoot,elem.attrib['path'])
+          elem.attrib['path'] = posixpath.join(base.appRunner.multifileRoot,elem.attrib['path'])
 
   def getConfig(self):
     return self.xml

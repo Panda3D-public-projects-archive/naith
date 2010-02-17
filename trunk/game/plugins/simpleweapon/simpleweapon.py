@@ -15,7 +15,7 @@
 
 
 
-import os.path
+import posixpath
 import random
 import math
 
@@ -60,7 +60,7 @@ class SimpleWeapon:
       self.bulletWeight = 0.004
 
     # Determine the weapon meshes path...
-    self.meshPath = os.path.join(basePath,xml.find('egg').get('file'))
+    self.meshPath = posixpath.join(basePath, xml.find('egg').get('file'))
 
     # Get the camera interface, so we can zoom in when the player aims...
     self.camera = manager.get(xml.find('camera').get('plugin'))
