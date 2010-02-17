@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright Aaron Snoswell
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os, random
+import posixpath, random
 #from pandac.PandaModules import Point2, Vec3, Vec4, NodePath, CardMaker, Shader, ColorBlendAttrib, Texture
 from pandac.PandaModules import *
 from direct.task.Task import Task
@@ -133,7 +134,7 @@ class Clouds:
     
     self.cloudlist = []
     xmlcloudlist = [x for x in xml.findall('cloud')]
-    cloudsplattexture = loader.loadTexture(os.path.join(basePath, xml.find('splat').get('fname')))
+    cloudsplattexture = loader.loadTexture(posixpath.join(basePath, xml.find('splat').get('fname')))
     
     # XXX See if the user is requesting a cloudbox or a position
     # Needs to be handled much better than this
@@ -167,12 +168,12 @@ class Clouds:
                      random.randint(self.cloudbox[0].getY(), self.cloudbox[1].getY()),
                      random.randint(self.cloudbox[0].getZ(), self.cloudbox[1].getZ()))
         
-        cloud = CloudObj(os.path.join(basePath, filename), cloudsplattexture, pos, softness)
+        cloud = CloudObj(posixpath.join(basePath, filename), cloudsplattexture, pos, softness)
         cloud.generate_sprites()
         self.cloudlist.append(cloud)
       else:
         # Default the cloud to (0,0,0)
-        cloud = CloudObj(os.path.join(basePath, filename), cloudsplattexture, self.cloudpos, softness)
+        cloud = CloudObj(posixpath.join(basePath, filename), cloudsplattexture, self.cloudpos, softness)
         cloud.generate_sprites()
         self.cloudlist.append(cloud)
       

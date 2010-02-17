@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
+import posixpath
 from pandac.PandaModules import Vec3, Vec4, BitMask32, TransparencyAttrib
 
 class Sky:
@@ -32,7 +32,7 @@ class Sky:
     self.model = None
     skydome = xml.find('skydome')
     if skydome != None:
-      self.model = loader.loadModel(os.path.join(basePath, 'skydome'))
+      self.model = loader.loadModel(posixpath.join(basePath, 'skydome'))
       self.model.setLightOff(1)
       self.model.setShaderOff(1)
       self.model.setCompass()
@@ -40,7 +40,7 @@ class Sky:
       self.model.setDepthWrite(False)
       self.model.setDepthTest(False)
       self.model.setColor(1, 1, 1, 1)
-      self.model.setTexture(loader.loadTexture(os.path.join(basePath, skydome.get('filename'))))
+      self.model.setTexture(loader.loadTexture(posixpath.join(basePath, skydome.get('filename'))))
       self.model.setTag('sun', 'True')
       self.model.reparentTo(base.cam)
       self.model.hide()

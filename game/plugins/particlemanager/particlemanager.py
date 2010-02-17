@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright Tom SF Haines
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,7 @@
 
 
 
-import os.path
+import posixpath
 
 from pandac.PandaModules import *
 from direct.particles.ParticleEffect import ParticleEffect
@@ -42,7 +43,7 @@ class ParticleManager:
       new['name'] = effect.get('name')
       self.pdb[new['name']] = new
 
-      new['file'] = os.path.join(self.basePath,effect.get('file'))
+      new['file'] = posixpath.join(self.basePath,effect.get('file'))
       new['life'] = effect.get('lifetime',None)
 
     # This stores all current particle effects, indexed by their id - used by stop to end it all...

@@ -14,7 +14,7 @@
 # limitations under the License.
 
 
-import os.path
+import posixpath
 from pandac.PandaModules import *
 
 
@@ -83,7 +83,7 @@ class PhysicsObject:
     # Make all of the relevant instances...
     for make in toMake:
       # Load the mesh, parent to render...
-      filename = os.path.join(basePath,self.xml.find('mesh').get('filename'))
+      filename = posixpath.join(basePath, self.xml.find('mesh').get('filename'))
       model = loader.loadModel(filename)
       model.reparentTo(self.node)
       model.setShaderAuto()
@@ -91,7 +91,7 @@ class PhysicsObject:
         
       if pType=='mesh':
         # Need some way of calculating/obtaining an inertial tensor - currently using a box centered on the object with the dimensions of the collision meshes bounding axis aligned box...
-        colMesh = loader.loadModel(os.path.join(basePath,phys.get('filename')))
+        colMesh = loader.loadModel(posixpath.join(basePath,phys.get('filename')))
 
       # Create the collision object...
       if pType=='sphere':

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright Tom SF Haines
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,7 @@
 # limitations under the License.
 
 
-import os.path
+import posixpath
 from pandac.PandaModules import *
 
 
@@ -93,7 +94,7 @@ class StaticObject:
     for make in toMake:
       if self.xml.find('mesh') != None:
         # Load the mesh, parent to render...
-        filename = os.path.join(basePath,self.xml.find('mesh').get('filename'))
+        filename = posixpath.join(basePath,self.xml.find('mesh').get('filename'))
         model = loader.loadModel(filename)
         model.reparentTo(self.node)
         model.setShaderAuto()
@@ -110,7 +111,7 @@ class StaticObject:
       elif pType=='capsule':
         col = OdeCappedCylinderGeom(self.ode.getSpace(), float(phys.get('radius')), float(phys.get('height')))
       elif pType=='mesh':
-        colMesh = loader.loadModel(os.path.join(basePath,phys.get('filename')))
+        colMesh = loader.loadModel(posixpath.join(basePath,phys.get('filename')))
         colTri = OdeTriMeshData(colMesh,True)
         col = OdeTriMeshGeom(self.ode.getSpace(),colTri)
       elif pType=='plane':
