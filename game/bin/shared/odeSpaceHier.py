@@ -36,7 +36,7 @@ def eggToOde(np,surfaceType): # ,depth = 0
     #print ('|'*depth) + 'notgeom, ' + str(np.node().getClassType())
     # Check the children for useful data...
     children = np.getChildren()
-    for i in xrange(children.size()):
+    for i, child in enumerate(children):
       child = children[i]
       
       for r in eggToOde(child,surfaceType): # ,depth+1
