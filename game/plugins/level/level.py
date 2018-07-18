@@ -138,7 +138,7 @@ class Level:
     if self.things == None: return []
     col = self.things.findAllMatches('**/=IsA='+name)
     ret = []
-    for i in xrange(col.size()):
+    for i in xrange(col.get_num_paths()):
       ret.append(col[i])
     return ret
 

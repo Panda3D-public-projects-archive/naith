@@ -35,7 +35,7 @@ class CullAABB:
       
     for aabb in self.bounds:
       children = aabb.cell.getChildren()
-      for i in xrange(children.size()):
+      for i in xrange(children.get_num_paths()):
         child = children[i]
         child.reparentTo(aabb.cell.getParent())
 

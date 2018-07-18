@@ -48,7 +48,7 @@ def getWaterSurface(manager, polycount = 50000, size = (512,512)):
   ht = HeightfieldTesselator("plane")
   assert ht.setHeightfield(Filename("%s/black-%dx%d.png" % (cacheDir,size[0],size[1])))
   ht.setPolyCount(polycount)
-  ht.setFocalPoint(size[0] * 0.5, size[1] * 0.5)
+  ht.setFocalPoint(int(size[0] * 0.5), int(size[1] * 0.5))
   node = ht.generate()
   node.setPos(-0.5 * size[0], 0.5 * size[1], 0)
   node.flattenLight()

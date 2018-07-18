@@ -92,7 +92,7 @@ class ParticleManager:
         if self.effects.has_key(id(p)):
           pn = self.effects[id(p)]
           pn[0].cleanup()
-          pn[0].remove()
+          pn[0].remove_node()
           pn[1].removeNode()
           del self.effects[id(p)]
       s = Sequence(Wait(float(self.pdb[name]['life'])),Func(kill,p))
