@@ -6,7 +6,7 @@
 import sys
 from panda3d.core import *
 from direct.showbase import DirectObject
-import direct.directbase.DirectStart
+from direct.showbase.ShowBase import ShowBase
 
 
 # Get the particle panel up - requires tk...

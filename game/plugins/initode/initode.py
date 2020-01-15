@@ -20,7 +20,7 @@ import math
 from panda3d.core import *
 from panda3d.ode import *
 from direct.showbase import DirectObject
-import direct.directbase.DirectStart
+from direct.showbase.ShowBase import ShowBase
 
 
 class InitODE(DirectObject.DirectObject):

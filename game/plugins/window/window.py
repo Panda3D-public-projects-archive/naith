@@ -14,7 +14,8 @@
 # limitations under the License.
 
 from panda3d.core import *
-from direct.directbase import DirectStart
+from direct.showbase.ShowBase import ShowBase
+
 from sys import exit
 import datetime
 

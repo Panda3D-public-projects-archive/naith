@@ -22,7 +22,7 @@
 from panda3d.core import loadPrcFile, loadPrcFileData
 loadPrcFile("config/settings.prc")
 loadPrcFileData("window-disable", "window-type none")
-import direct.directbase.DirectStart
+from direct.showbase.ShowBase import ShowBase
 import direct.stdpy.file as pfile
 from direct.task import Task
 
@@ -30,6 +30,7 @@ from bin.manager import *
 
 import sys
 
+base = ShowBase()
 #messenger.toggleVerbose()
 
 # Detect if we are in a multifile and, if so, jump through hoops that shouldn't exist...

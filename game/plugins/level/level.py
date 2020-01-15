@@ -19,7 +19,7 @@ import posixpath
 import time
 
 from panda3d.core import *
-import direct.directbase.DirectStart
+from direct.showbase.ShowBase import ShowBase
 
 from bin.shared import odeSpaceHier
 

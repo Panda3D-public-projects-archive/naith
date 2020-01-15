@@ -20,7 +20,7 @@ import xml.etree.ElementTree as et
 import imp
 import types
 
-import direct.directbase.DirectStart
+from direct.showbase.ShowBase import ShowBase
 
 
 class Manager:

@@ -16,7 +16,7 @@
 
 
 from panda3d.core import *
-import direct.directbase.DirectStart
+from direct.showbase.ShowBase import ShowBase
 from panda3d.core import PandaSystem
 
 from sys import platform
