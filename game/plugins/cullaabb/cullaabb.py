@@ -35,8 +35,7 @@ class CullAABB:
       
     for aabb in self.bounds:
       children = aabb.cell.getChildren()
-      for i in xrange(children.get_num_paths()):
-        child = children[i]
+      for child in children:
         child.reparentTo(aabb.cell.getParent())
 
       aabb.cell.removeNode()
