@@ -17,7 +17,8 @@
 
 import math
 
-from pandac.PandaModules import *
+from panda3d.core import *
+from panda3d.ode import *
 from direct.showbase import DirectObject
 import direct.directbase.DirectStart
 

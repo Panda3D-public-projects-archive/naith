@@ -14,7 +14,7 @@
 # limitations under the License.
 
 import posixpath
-from pandac.PandaModules import Vec3, Vec4, BitMask32, TransparencyAttrib
+from panda3d.core import Vec3, Vec4, BitMask32, TransparencyAttrib
 
 class Sky:
   """This loads a skydome/box/whatever the user specified."""

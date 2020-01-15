@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pandac.PandaModules import CardMaker, Texture, ModelRoot, ColorBlendAttrib, TransparencyAttrib, DecalEffect, NodePath, Point2, Point3, BitMask32
+from panda3d.core import CardMaker, Texture, ModelRoot, ColorBlendAttrib, TransparencyAttrib, DecalEffect, NodePath, Point2, Point3, BitMask32
 from random import random
 
 BULLETHOLE_SIZE = 0.05

@@ -13,7 +13,8 @@
 # limitations under the License.
 
 
-from pandac.PandaModules import *
+from panda3d.core import *
+from panda3d.ode import *
 
 
 def eggToOde(np,surfaceType): # ,depth = 0

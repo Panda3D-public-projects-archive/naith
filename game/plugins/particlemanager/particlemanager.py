@@ -17,7 +17,7 @@
 
 import posixpath
 
-from pandac.PandaModules import *
+from panda3d.core import *
 from direct.particles.ParticleEffect import ParticleEffect
 from direct.interval.MetaInterval import Sequence
 from direct.interval.FunctionInterval import *

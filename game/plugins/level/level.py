@@ -18,7 +18,7 @@
 import posixpath
 import time
 
-from pandac.PandaModules import *
+from panda3d.core import *
 import direct.directbase.DirectStart
 
 from bin.shared import odeSpaceHier

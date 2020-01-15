@@ -16,10 +16,10 @@
 __all__ = ["Water"]
 
 import os
-from pandac.PandaModules import HeightfieldTesselator, PNMImage, Filename
-from pandac.PandaModules import BitMask32, TransparencyAttrib, Texture
-from pandac.PandaModules import RenderState, CullFaceAttrib, Fog
-from pandac.PandaModules import Plane, PlaneNode, Vec4, Vec3, Point3, NodePath
+from panda3d.core import HeightfieldTesselator, PNMImage, Filename
+from panda3d.core import BitMask32, TransparencyAttrib, Texture
+from panda3d.core import RenderState, CullFaceAttrib, Fog
+from panda3d.core import Plane, PlaneNode, Vec4, Vec3, Point3, NodePath
 
 
 

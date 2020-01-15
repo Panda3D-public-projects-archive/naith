@@ -14,7 +14,7 @@
 # limitations under the License.
 
 
-from pandac.PandaModules import *
+from panda3d.core import *
 
 from aabb import *
 

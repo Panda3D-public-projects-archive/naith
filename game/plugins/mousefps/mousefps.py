@@ -15,9 +15,9 @@
 
 
 
-from pandac.PandaModules import *
+from panda3d.core import *
 import direct.directbase.DirectStart
-from pandac.PandaModules import PandaSystem
+from panda3d.core import PandaSystem
 
 from sys import platform
 

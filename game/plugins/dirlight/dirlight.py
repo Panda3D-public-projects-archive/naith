@@ -14,8 +14,8 @@
 # limitations under the License.
 
 
-from pandac.PandaModules import NodePath, VBase4, BitMask32
-from pandac.PandaModules import DirectionalLight as PDirectionalLight
+from panda3d.core import NodePath, VBase4, BitMask32
+from panda3d.core import DirectionalLight as PDirectionalLight
 
 class DirLight:
   """Creates a simple directional light"""
