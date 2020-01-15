@@ -54,4 +54,4 @@ def firstLight(task):
   return Task.done
 
 taskMgr.add(firstLight,'firstLight')
-run()
+base.run()
