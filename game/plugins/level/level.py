@@ -18,8 +18,8 @@
 import posixpath
 import time
 
-from pandac.PandaModules import *
-import direct.directbase.DirectStart
+from panda3d.core import *
+from direct.showbase.ShowBase import ShowBase
 
 from bin.shared import odeSpaceHier
 
@@ -137,10 +137,7 @@ class Level:
     """Given a name this returns a list of all objects in the things structure that have the tag IsA with the given name as the data. Will return an empty list if none available."""
     if self.things == None: return []
     col = self.things.findAllMatches('**/=IsA='+name)
-    ret = []
-    for i in xrange(col.get_num_paths()):
-      ret.append(col[i])
-    return ret
+    return col
 
   def toggleVisible(self):
     if self.rend.isHidden():

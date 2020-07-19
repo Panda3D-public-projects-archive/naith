@@ -17,7 +17,7 @@
 
 import posixpath
 
-from pandac.PandaModules import *
+from panda3d.core import *
 from direct.particles.ParticleEffect import ParticleEffect
 from direct.interval.MetaInterval import Sequence
 from direct.interval.FunctionInterval import *
@@ -54,7 +54,7 @@ class ParticleManager:
     # Kill all running effects - as these are meant to be 'fire once' particle effects this makes sense...
     for key,pn in self.effects.iteritems():
       pn[0].cleanup()
-      pn[0].remove()
+      pn[0].remove_node()
       pn[1].removeNode()
 
 

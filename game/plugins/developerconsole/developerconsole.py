@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pandac.PandaModules import TextNode, TextProperties, TextPropertiesManager
+from panda3d.core import TextNode, TextProperties, TextPropertiesManager
 from direct.showbase.DirectObject import DirectObject
 from direct.gui.DirectGui import DirectFrame, DirectEntry
 from direct.gui.OnscreenText import OnscreenText

@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pandac.PandaModules import Point2, Vec3, Vec4, NodePath, CardMaker, Shader, ColorBlendAttrib, Texture, BitMask32, TransparencyAttrib, OmniBoundingVolume
+from panda3d.core import Point2, Vec3, Vec4, NodePath, CardMaker, Shader, ColorBlendAttrib, Texture, BitMask32, TransparencyAttrib, OmniBoundingVolume
 import posixpath
 
 class Sun:

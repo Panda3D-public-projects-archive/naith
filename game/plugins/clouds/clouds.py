@@ -14,8 +14,8 @@
 # limitations under the License.
 
 import posixpath, random
-#from pandac.PandaModules import Point2, Vec3, Vec4, NodePath, CardMaker, Shader, ColorBlendAttrib, Texture
-from pandac.PandaModules import *
+#from panda3d.core import Point2, Vec3, Vec4, NodePath, CardMaker, Shader, ColorBlendAttrib, Texture
+from panda3d.core import *
 from direct.task.Task import Task
 from direct.interval.IntervalGlobal import *
 

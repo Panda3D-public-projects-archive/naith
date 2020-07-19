@@ -13,8 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pandac.PandaModules import *
-from direct.directbase import DirectStart
+from panda3d.core import *
+from direct.showbase.ShowBase import ShowBase
+
 from sys import exit
 import datetime
 

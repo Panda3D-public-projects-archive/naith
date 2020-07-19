@@ -4,9 +4,9 @@
 # Useful for editting the various particles contained within this directory.
 
 import sys
-from pandac.PandaModules import *
+from panda3d.core import *
 from direct.showbase import DirectObject
-import direct.directbase.DirectStart
+from direct.showbase.ShowBase import ShowBase
 
 
 # Get the particle panel up - requires tk...

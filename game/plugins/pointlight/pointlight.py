@@ -13,8 +13,8 @@
 # limitations under the License.
 
 
-from pandac.PandaModules import VBase4
-from pandac.PandaModules import PointLight as PPointLight
+from panda3d.core import VBase4
+from panda3d.core import PointLight as PPointLight
 
 class PointLight:
   """Creates a simple point light"""

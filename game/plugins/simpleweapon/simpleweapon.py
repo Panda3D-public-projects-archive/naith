@@ -25,7 +25,8 @@ from bin.shared import csp
 from direct.actor.Actor import Actor
 from direct.interval.IntervalGlobal import *
 from direct.interval.ActorInterval import ActorInterval
-from pandac.PandaModules import *
+from panda3d.core import *
+from panda3d.ode import *
 
 
 class SimpleWeapon:

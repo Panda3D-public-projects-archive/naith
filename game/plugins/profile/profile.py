@@ -17,7 +17,7 @@
 import subprocess
 
 from direct.showbase import DirectObject
-from pandac.PandaModules import *
+from panda3d.core import *
 
 class Profile(DirectObject.DirectObject):
   """Connects to pstats, if pstats is not running on the local computer it will set a copy running regardless."""

@@ -13,8 +13,8 @@
 # limitations under the License.
 
 
-from pandac.PandaModules import VBase4
-from pandac.PandaModules import AmbientLight as PAmbientLight
+from panda3d.core import VBase4
+from panda3d.core import AmbientLight as PAmbientLight
 
 class AmbLight:
   """Creates a simple ambient light"""

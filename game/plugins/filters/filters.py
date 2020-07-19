@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from pandac.PandaModules import LightRampAttrib
+from panda3d.core import LightRampAttrib
 from direct.filter.CommonFilters import CommonFilters
 
 class Filters:

@@ -13,9 +13,9 @@
 # limitations under the License.
 
 
-from pandac.PandaModules import VBase4
-from pandac.PandaModules import Spotlight as PSpotLight
-from pandac.PandaModules import PerspectiveLens
+from panda3d.core import VBase4
+from panda3d.core import Spotlight as PSpotLight
+from panda3d.core import PerspectiveLens
 
 # XXX Name should be Spotlight (see panda manual) but for consistency, I'll leave it as is
 class SpotLight:

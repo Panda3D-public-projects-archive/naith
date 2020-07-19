@@ -16,7 +16,7 @@
 
 # Custom string parsers, for turning certain config parameters into useful data.
 
-from pandac.PandaModules import *
+from panda3d.core import *
 
 
 def getPos(s):

@@ -13,7 +13,8 @@
 # limitations under the License.
 
 
-from pandac.PandaModules import *
+from panda3d.core import *
+from panda3d.ode import *
 
 
 def eggToOde(np,surfaceType): # ,depth = 0
@@ -36,9 +37,7 @@ def eggToOde(np,surfaceType): # ,depth = 0
     #print ('|'*depth) + 'notgeom, ' + str(np.node().getClassType())
     # Check the children for useful data...
     children = np.getChildren()
-    for i, child in enumerate(children):
-      child = children[i]
-      
+    for child in children:
       for r in eggToOde(child,surfaceType): # ,depth+1
         yield None
         geom = r

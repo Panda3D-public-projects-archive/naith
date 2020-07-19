@@ -19,10 +19,10 @@
 # Entry point - sets up the plugin system by giving it the config file to load and then releases panda to do its thing...
 
 # Important: this must be first
-from pandac.PandaModules import loadPrcFile, loadPrcFileData
+from panda3d.core import loadPrcFile, loadPrcFileData
 loadPrcFile("config/settings.prc")
 loadPrcFileData("window-disable", "window-type none")
-import direct.directbase.DirectStart
+from direct.showbase.ShowBase import ShowBase
 import direct.stdpy.file as pfile
 from direct.task import Task
 
@@ -30,6 +30,7 @@ from bin.manager import *
 
 import sys
 
+base = ShowBase()
 #messenger.toggleVerbose()
 
 # Detect if we are in a multifile and, if so, jump through hoops that shouldn't exist...
@@ -54,4 +55,4 @@ def firstLight(task):
   return Task.done
 
 taskMgr.add(firstLight,'firstLight')
-run()
+base.run()
