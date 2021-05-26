@@ -156,7 +156,7 @@ class Clouds:
      
     
     # Iterate over each of the requested clouds
-    for cloud in xrange(len(xmlcloudlist)):
+    for cloud in range(len(xmlcloudlist)):
       # Read the values from the xml file
       filename = str(xmlcloudlist[cloud].get('filename'))
       softness = float(xmlcloudlist[cloud].get('softness'))

@@ -52,7 +52,7 @@ class ParticleManager:
 
   def stop(self):
     # Kill all running effects - as these are meant to be 'fire once' particle effects this makes sense...
-    for key,pn in self.effects.iteritems():
+    for key,pn in self.effects.items():
       pn[0].cleanup()
       pn[0].remove_node()
       pn[1].removeNode()
@@ -89,7 +89,7 @@ class ParticleManager:
     # If the effect has a finite life arrange for it to be terminated...
     if self.pdb[name]['life']!=None:
       def kill(p):
-        if self.effects.has_key(id(p)):
+        if id(p) in self.effects:
           pn = self.effects[id(p)]
           pn[0].cleanup()
           pn[0].remove_node()

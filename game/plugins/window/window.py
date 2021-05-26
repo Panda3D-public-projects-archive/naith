@@ -33,7 +33,7 @@ class Window:
     # Get supported resolutions...
     info = base.pipe.getDisplayInformation()
     self.res = []
-    for i in xrange(info.getTotalDisplayModes()):
+    for i in range(info.getTotalDisplayModes()):
       self.res.append((info.getDisplayModeWidth(i),info.getDisplayModeHeight(i)))
 
   def reload(self,manager,xml):
@@ -74,9 +74,9 @@ class Window:
       self.task = taskMgr.add(self.record,'RecordFrames')
       globalClock.setMode(ClockObject.MNonRealTime)
       globalClock.setFrameRate(25.0)
-      print 'started recording'
+      print( 'started recording')
     else:
       globalClock.setMode(ClockObject.MNormal)
       taskMgr.remove(self.task)
       self.task = None
-      print 'ended recording'
+      print( 'ended recording')

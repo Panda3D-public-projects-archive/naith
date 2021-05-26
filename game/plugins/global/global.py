@@ -28,7 +28,7 @@ class Global:
     # Some clever code for handling being in a p3d file - turn paths into full paths if needed...
     if base.appRunner!=None:
       for elem in self.xml:
-        if elem.attrib.has_key('path'):
+        if 'path' in elem.attrib:
           elem.attrib['path'] = posixpath.join(base.appRunner.multifileRoot,elem.attrib['path'])
 
   def getConfig(self):

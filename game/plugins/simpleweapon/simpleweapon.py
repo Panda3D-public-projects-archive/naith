@@ -161,7 +161,7 @@ class SimpleWeapon:
           try:
             ang = -math.acos(sparkDir[2])
           except:
-            print 'Angle problem', sparkDir
+            print( 'Angle problem', sparkDir)
             ang = 0.0
           axis = Vec3(0.0,0.0,1.0).cross(sparkDir)
           axis.normalize()

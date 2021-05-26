@@ -21,7 +21,7 @@ from panda3d.core import *
 
 def getPos(s):
   """Given a string in a form "5,4,3" returns a Vec3 for that vector."""
-  n = map(lambda x:float(x),s.split(','))
+  n = [float(x) for x in s.split(',')]
   if len(n)!=3:
     raise Exception('Bad vector string')
   return Vec3(n[0],n[1],n[2])

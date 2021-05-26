@@ -35,7 +35,7 @@ base = ShowBase()
 
 # Detect if we are in a multifile and, if so, jump through hoops that shouldn't exist...
 if base.appRunner!=None:
-  print 'In multifile, root = '+base.appRunner.multifileRoot
+  print('In multifile, root = '+base.appRunner.multifileRoot)
   baseDir = base.appRunner.multifileRoot+'/'
 else:
   baseDir = ''
@@ -50,7 +50,7 @@ def firstLight(task):
   else:
     cn = 'menu'
   
-  print 'Starting configuration ' + cn
+  print('Starting configuration ' + cn)
   plugin.transition(cn)
   return Task.done
 

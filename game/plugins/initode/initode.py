@@ -42,7 +42,7 @@ class InitODE(DirectObject.DirectObject):
     surElem = [x for x in xml.findall('surface')]
     self.world.initSurfaceTable(len(surElem))
     self.surFromName = dict()
-    for a in xrange(len(surElem)):
+    for a in range(len(surElem)):
       self.surFromName[surElem[a].get('name')] = a
 
       # Maths used below is obviously wrong - should probably work out something better.
@@ -54,7 +54,7 @@ class InitODE(DirectObject.DirectObject):
       self.world.setSurfaceEntry(a,a,mu,bounce,absorb,erp,cfm,slip,dampen)
 
       # Interaction with other surfaces...
-      for b in xrange(a+1,len(surElem)):
+      for b in range(a+1,len(surElem)):
         mu = float(surElem[a].get('mu')) * float(surElem[b].get('mu'))
         bounce = float(surElem[a].get('bounce')) * float(surElem[b].get('bounce'))
         absorb = float(surElem[a].get('absorb')) + float(surElem[b].get('absorb'))
@@ -99,11 +99,11 @@ class InitODE(DirectObject.DirectObject):
     self.timeRem += globalClock.getDt()
     while self.timeRem>self.step:
       # Call the pre-collision functions...
-      for ident,func in self.preCollide.iteritems():
+      for ident,func in self.preCollide.items():
         func()
 
       # Apply damping to all objects in damping db...
-      for key,data in self.damping.iteritems():
+      for key,data in self.damping.items():
         if data[0].isEnabled():
           vel = data[0].getLinearVel()
           if vel.length()>1e3: # Cap dangerous motion.
@@ -126,7 +126,7 @@ class InitODE(DirectObject.DirectObject):
       self.contactGroup.empty() # Clear the contact joints
 
       # Call the post-collision functions...
-      for ident,func in self.postCollide.iteritems():
+      for ident,func in self.postCollide.items():
         func()
 
     # Update all objects registered with this class to have their positions updated...
@@ -141,7 +141,7 @@ class InitODE(DirectObject.DirectObject):
     geom1 = entry.getGeom1()
     geom2 = entry.getGeom2()
 
-    for geom,func in self.collCB.iteritems():
+    for geom,func in self.collCB.items():
       if geom==geom1:
         func(entry,False)
       if geom==geom2:
@@ -170,10 +170,10 @@ class InitODE(DirectObject.DirectObject):
 
   def getSurface(self,name):
     """This returns the surface number given the surface name. If it doesn't exist it prints a warning and returns 0 instead of failing."""
-    if self.surFromName.has_key(name):
+    if name in self.surFromName:
       return self.surFromName[name]
     else:
-      print 'Warning: Surface %s does not exist'%name
+      print( 'Warning: Surface %s does not exist'%name)
       return 0
 
   def getDt(self):
@@ -190,7 +190,7 @@ class InitODE(DirectObject.DirectObject):
 
   def unregBodySynch(self,node):
     """Removes a NodePath/Body pair from the synchronisation database, so the NodePath will stop automatically tracking the Body."""
-    if self.synch.has_key(node.getKey()):
+    if node.getKey() in self.synch:
       self.synch[node.getKey()][1].setData(None)
       del self.synch[node.getKey()]
 
@@ -200,7 +200,7 @@ class InitODE(DirectObject.DirectObject):
 
   def unregPreFunc(self,name):
     """Unregisters a function to be called every step, by name."""
-    if self.preCollide.has_key(name):
+    if name in self.preCollide:
       del self.preCollide[name]
 
   def regPostFunc(self,name,func):
@@ -209,7 +209,7 @@ class InitODE(DirectObject.DirectObject):
 
   def unregPostFunc(self,name):
     """Unregisters a function to be called every step, by name."""
-    if self.postCollide.has_key(name):
+    if name in self.postCollide:
       del self.postCollide[name]
 
   def regCollisionCB(self,geom,func):
@@ -218,7 +218,7 @@ class InitODE(DirectObject.DirectObject):
 
   def unregCollisionCB(self,geom):
     """Unregisters the collision callback for a given geom."""
-    if self.collCB.has_key(geom):
+    if geom in self.collCB:
       del self.collCB[geom]
 
   def regDamping(self,body,linear,angular):
@@ -228,5 +228,5 @@ class InitODE(DirectObject.DirectObject):
   def unregDampingl(self,body):
     """Unregisters a body from damping."""
     key = body.getId()
-    if self.damping.has_key(key):
+    if key in self.damping:
       del self.air_resist[key]

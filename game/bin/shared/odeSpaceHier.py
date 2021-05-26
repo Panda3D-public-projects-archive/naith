@@ -32,9 +32,9 @@ def eggToOde(np,surfaceType): # ,depth = 0
     tmg.setQuaternion(nt.getQuat())
     
     output.append(tmg)
-    #print ('|'*depth) + 'geom, ' + str(np.node().getClassType()) + ', ' + str(tmg.getNumTriangles())
+    #print( ('|'*depth) + 'geom, ' + str(np.node().getClassType()) + ', ' + str(tmg.getNumTriangles()))
   else:
-    #print ('|'*depth) + 'notgeom, ' + str(np.node().getClassType())
+    #print( ('|'*depth) + 'notgeom, ' + str(np.node().getClassType()))
     # Check the children for useful data...
     children = np.getChildren()
     for child in children:

@@ -107,7 +107,7 @@ class Level:
         self.col = r
 
       if (self.col==None):
-        print 'WARNING: Collision geometry contained nothing to collide against.'
+        print( 'WARNING: Collision geometry contained nothing to collide against.')
       else:
         self.ode.getSpace().add(self.col)
 

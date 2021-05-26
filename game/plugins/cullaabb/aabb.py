@@ -49,7 +49,7 @@ class SetAABB:
     """Given a list of AABB's."""
     # Work out what happens for dividing on each dimension - sort by the AABB's centres and then select the centre aabb by volume, then try dividing by the sides & centre of the centre aabb and count how many nodes are intercepted with a cost for offsetting too far - select the dimension division with the least divided nodes...
     # Get half the volume...
-    totVolume = sum(map(lambda x:x.volume,aabbs))
+    totVolume = sum(list(map(lambda x:x.volume,aabbs)))
     halfVolume = totVolume*0.5
 
     # Variables we are finding the best option for...
@@ -61,7 +61,7 @@ class SetAABB:
     bestHigh = []
     
     # Try each dimension, with multiple centre choice, store the best...
-    for dim in xrange(3):
+    for dim in range(3):
       byDim = sorted(aabbs,key=lambda x: x.centre[dim])
       centre = 0
       volume = 0.0
@@ -166,17 +166,17 @@ class Portal:
       ret[(dim+2)%3] = base[1]
       ret[dim] = side
       return ret
-    square3d = map(incDim,square2d)
+    square3d = list(map(incDim,square2d))
 
     # Extract the 4 coordinates...
     self.verts = []
     for index in square3d:
-      coord = map(lambda d: aabb.bounds[d][index[d]],xrange(3))
+      coord = list(map(lambda d: aabb.bounds[d][index[d]],range(3)))
       self.verts.append(coord)
 
     # If needed reorder them so its anticlockwise ordering from the view of the centre of the aabb...
-    offsetC = map(lambda x: map(lambda a,b: a-b,x,aabb.centre),self.verts)
-    ind = sum(map(lambda i:offsetC[1][i]*(offsetC[0][(i+1)%3]*offsetC[2][(i+2)%3] - offsetC[0][(i+2)%3]*offsetC[2][(i+1)%3]),xrange(3)))
+    offsetC = list(map(lambda x: map(lambda a,b: a-b,x,aabb.centre),self.verts))
+    ind = sum(list(map(lambda i:offsetC[1][i]*(offsetC[0][(i+1)%3]*offsetC[2][(i+2)%3] - offsetC[0][(i+2)%3]*offsetC[2][(i+1)%3]),range(3))))
     if ind<0.0:
       self.verts = [self.verts[0],self.verts[3],self.verts[2],self.verts[1]]
 
@@ -186,7 +186,7 @@ class Portal:
     else:
       order = [0,1,2,3]
 
-    c = map(lambda i:sum(map(lambda x:x[i],self.verts))/4.0,xrange(3))
+    c = list(map(lambda i:sum(list(map(lambda x:x[i],self.verts)))/4.0,range(3)))
 
     portalNode.setPos(render,Vec3(c[0],c[1],c[2]))
 
@@ -204,7 +204,7 @@ def findPortals(aabbs,overlap = 1e-3):
   
   # We process each dimension seperatly - this first loop is over the dimensions...
   ret = []
-  for dim in xrange(3):
+  for dim in range(3):
     otherDim = [0,1,2]
     del otherDim[dim]
 
@@ -226,7 +226,7 @@ def findPortals(aabbs,overlap = 1e-3):
         
       # Check event aabb against existing aabbs for being the smaller face...
       done = False
-      for key,aabb in state.iteritems():
+      for key,aabb in state.items():
         # Verify that the sorting dimension is not contained, i.e. they overlap so a portal can be created...
         if (event[2].bounds[dim][0]>aabb.bounds[dim][0]) == (event[2].bounds[dim][1]<aabb.bounds[dim][1]):
           continue
@@ -261,7 +261,7 @@ def findPortals(aabbs,overlap = 1e-3):
           event[2].portals[dim][evSide].append(portal)
           aabb.portals[dim][(evSide+1)%2].append(portal)
 
-        elif len(filter(lambda x:x>0,withinCount))==2:
+        elif len(list(filter(lambda x:x>0,withinCount)))==2:
           exp = 'Partial interception - culling aabbs can not intecept at corners/edges due to undefinable behaviour - must only overlap with one face fully contained within another.'
           exp += ' dimension = ' + str(dim) + '; within = ' + str(withinCount) + '; '
           exp += str(event[2]) + ' against ' + str(aabb)

@@ -30,7 +30,7 @@ def nearestHit(space,ray):
   bestDepth = None
 
   cc = OdeUtil.collide(ray,OdeUtil.spaceToGeom(space))
-  for i in xrange(cc.getNumContacts()):
+  for i in range(cc.getNumContacts()):
     cg = cc.getContactGeom(i)
     depth = cg.getDepth()
     if bestDepth==None or bestDepth>depth:
@@ -46,7 +46,7 @@ def nearestHit(space,ray):
   
 def collides(space,obj):
   """Not really ray related, but similar to above. Tests if the given obj collides with anything in the given space - returns True if it does, False if it does not."""
-  for i in xrange(space.getNumGeoms()):
+  for i in range(space.getNumGeoms()):
     geom = space.getGeom(i)
 
     testA = (geom.getCollideBits() & obj.getCollideBits()).isZero()

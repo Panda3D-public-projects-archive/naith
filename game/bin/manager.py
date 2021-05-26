@@ -77,7 +77,7 @@ class Manager:
       for obj in self.oldObjList:
         inst = obj[0]
         name = obj[1]
-        if (not self.oldNamed.has_key(name)) or self.oldNamed[name]!=True:
+        if (not name in self.oldNamed) or self.oldNamed[name]!=True:
           # It needs to die - we let the reference count being zeroed do the actual deletion but it might have a slow death, so we use the destroy method/generator to make it happen during the progress bar ratehr than blocking the gc at some random point...
           destroy = getattr(inst,'destroy',None)
           if isinstance(destroy,types.MethodType):
@@ -141,37 +141,37 @@ class Manager:
     name = element.get('name')
 
     # Step 2 - get the plugin - load it if it is not already loaded...
-    if not self.plugin.has_key(plugin):
-      print 'Loading plugin', plugin
+    if not plugin in self.plugin:
+      print( 'Loading plugin', plugin)
       base = self.pluginDir + '.' + plugin.lower()
       plug = __import__(base, globals(), locals(),[plugin.lower()])
       plug = getattr(plug,plugin.lower())
       self.plugin[plugin] = plug
-      print 'Loaded', plugin
+      print( 'Loaded', plugin)
       yield None
 
     # Step 3a - check if there is an old object that can be repurposed, otherwise create a new object...
     done = False
-    if self.oldNamed.has_key(name) and isinstance(self.oldNamed[name], getattr(self.plugin[plugin],plugin)) and getattr(self.oldNamed[name],'reload',None)!=None:
-      print 'Reusing', plugin
+    if name in self.oldNamed and isinstance(self.oldNamed[name], getattr(self.plugin[plugin],plugin)) and getattr(self.oldNamed[name],'reload',None)!=None:
+      print( 'Reusing', plugin)
       inst = self.oldNamed[name]
       self.oldNamed[name] = True # So we know its been re-used for during the deletion phase.
       inst.reload(self,element)
       yield None
-      print 'Reused',plugin
+      print( 'Reused',plugin)
       if getattr(inst,'postReload',None)!=None:
         for blah in inst.postReload():
           yield None
-        print 'post reload',plugin
+        print( 'post reload',plugin)
     else:
-      print 'Making', plugin
+      print( 'Making', plugin)
       inst = getattr(self.plugin[plugin],plugin)(self,element)
       yield None
-      print 'Made', plugin
+      print( 'Made', plugin)
       if getattr(inst,'postInit',None)!=None:
         for blah in inst.postInit():
           yield None
-        print 'post init',plugin
+        print( 'post init',plugin)
 
     # Step 3b - Stick it in the object database...
     self.objList.append((inst,name))
@@ -183,7 +183,7 @@ class Manager:
 
   def get(self,name):
     """Returns the plugin instance associated with the given name, or None if it doesn't exist."""
-    if self.named.has_key(name):
+    if name in self.named:
       return self.named[name]
     else:
       return None

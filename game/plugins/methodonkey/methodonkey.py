@@ -34,7 +34,7 @@ class MethodOnKey(DirectObject.DirectObject):
     self.actions[i][1]()
 
   def start(self):
-    for i in xrange(len(self.actions)):
+    for i in range(len(self.actions)):
       self.accept(self.actions[i][0],self.action,[i])
 
   def stop(self):

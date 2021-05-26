@@ -194,7 +194,7 @@ class Player:
         space = self.ode.getSpace()
 
         sc = int(math.ceil((self.height-self.crouchHeight)/self.radius))
-        for h in xrange(sc): # This is needed as a cylinder can miss collisions if tested this way.
+        for h in range(sc): # This is needed as a cylinder can miss collisions if tested this way.
           pos[2] -= self.radius
           self.standCheck.setPosition(pos)
           if ray_cast.collides(space,self.standCheck):
@@ -328,7 +328,7 @@ class Player:
 
   def onPlayerCollide(self,entry,which):
     # Handles the players collisions - used to work out the orientation of the surface the player is standing on...
-    for i in xrange(entry.getNumContacts()):
+    for i in range(entry.getNumContacts()):
       n = entry.getContactGeom(i).getNormal()
       if which:
         n *= -1.0

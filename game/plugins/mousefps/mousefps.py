@@ -89,7 +89,7 @@ class MouseFPS:
     md = base.win.getPointer(0)
     ox = md.getX() - self.originX
     oy = md.getY() - self.originY
-    #print ox,oy,md.getX(),md.getY(),self.originX,self.originY
+    #print( ox,oy,md.getX(),md.getY(),self.originX,self.originY)
     self.originX = md.getX()
     self.originY = md.getY()
 
@@ -109,6 +109,6 @@ class MouseFPS:
         self.originX = cx
         self.originY = cy
         self.reset = True
-        #print 'reset'
+        #print( 'reset')
 
     return task.cont
