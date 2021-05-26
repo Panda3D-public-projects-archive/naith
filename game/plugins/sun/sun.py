@@ -48,7 +48,7 @@ class Sun:
     
     godrays = xml.find('godrays')
     if godrays != None:
-      self.vlbuffer = base.win.makeTextureBuffer('volumetric-lighting', base.win.getXSize()/2, base.win.getYSize()/2)
+      self.vlbuffer = base.win.makeTextureBuffer('volumetric-lighting', base.win.getXSize()//2, base.win.getYSize()//2)
       self.vlbuffer.setClearColor(Vec4(0, 0, 0, 1))
       cam = base.makeCamera(self.vlbuffer)
       cam.node().setLens(base.camLens)
